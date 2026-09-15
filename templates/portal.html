@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIDU Weather Portal — Daily Climate Advisory</title>
+<meta name="description" content="VCDP CIDU public weather portal — daily localized weather updates and farming advisories for VCDP states, powered by NiMet and Automatic Weather Stations.">
+<style>
+:root{--teal:#008B8B;--dark:#006666;--teal-900:#004D4D;--teal-50:#F0FAFA;
+  --emerald:#059669;--rose:#E11D48;--sky:#0284C7;--amber:#D97706;
+  --slate-900:#0F172A;--slate-700:#334155;--slate-500:#64748B;--slate-300:#CBD5E1;
+  --slate-100:#F1F5F9;--slate-50:#F8FAFC;--white:#FFFFFF;
+  --radius:14px;--shadow:0 4px 20px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--slate-50);color:var(--slate-900);min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:linear-gradient(135deg,var(--teal),var(--dark));color:#fff;padding:1.4rem 1.25rem;text-align:center}
+.hdr h1{font-size:1.5rem;font-weight:800;margin-bottom:.25rem}
+.hdr p{font-size:.85rem;opacity:.92}
+.ai-pill{display:inline-block;margin-top:.5rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+  border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+.wrap{max-width:760px;margin:0 auto;padding:1.25rem;width:100%;flex:1}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1.25rem;border:1px solid var(--slate-100)}
+.card h2{font-size:1.02rem;color:var(--teal-900);margin-bottom:.6rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+@media (max-width:520px){.form-row{grid-template-columns:1fr}}
+label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--slate-500);margin-bottom:.35rem;letter-spacing:.03em}
+select,input[type=text],input[type=tel]{width:100%;padding:.65rem .7rem;border:1.5px solid var(--slate-300);border-radius:8px;font-size:.9rem;font-family:inherit;background:#fff}
+select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,139,139,.12)}
+.btn{display:inline-block;padding:.7rem 1.1rem;border-radius:9px;border:none;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--teal);color:#fff;width:100%}
+.btn-primary:hover{background:var(--dark)}
+.btn-outline{background:#fff;border:1.5px solid var(--slate-300);color:var(--slate-700)}
+.result{margin-top:1rem;padding:1rem;border-radius:10px;background:var(--teal-50);border:1px solid #cdeaea;display:none}
+.result.show{display:block}
+.result .temp{font-size:2rem;font-weight:800;color:var(--teal-900)}
+.result .sub{font-size:.85rem;color:var(--slate-700);margin:.15rem 0 .5rem}
+.result .advisory{background:#fff;border-radius:8px;padding:.75rem;font-size:.88rem;line-height:1.5;border:1px solid var(--slate-100);white-space:pre-wrap}
+.error-box{margin-top:.75rem;padding:.75rem;border-radius:8px;background:#fef2f2;color:#991B1B;font-size:.85rem;display:none}
+.error-box.show{display:block}
+/* Feedback */
+.fb-row{display:flex;gap:.6rem;margin-top:.9rem}
+.fb-btn{flex:1;padding:.65rem;border-radius:9px;border:1.5px solid var(--slate-300);background:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
+.fb-btn.yes:hover,.fb-btn.yes.picked{background:#ecfdf5;border-color:var(--emerald);color:#065f46}
+.fb-btn.no:hover,.fb-btn.no.picked{background:#fef2f2;border-color:var(--rose);color:#991B1B}
+.fb-thanks{margin-top:.6rem;font-size:.82rem;color:var(--emerald);font-weight:600;display:none}
+/* Chat */
+.chat-box{height:300px;overflow-y:auto;border:1px solid var(--slate-100);border-radius:10px;padding:.75rem;background:var(--slate-50);margin-bottom:.75rem}
+.msg{max-width:85%;padding:.55rem .75rem;border-radius:10px;margin-bottom:.5rem;font-size:.85rem;line-height:1.45;white-space:pre-wrap}
+.msg.bot{background:#fff;border:1px solid var(--slate-100);color:var(--slate-900)}
+.msg.user{background:var(--teal);color:#fff;margin-left:auto}
+.chat-input-row{display:flex;gap:.5rem}
+.chat-input-row input{flex:1}
+footer{text-align:center;font-size:.72rem;color:var(--slate-500);line-height:1.9;padding:1.25rem;border-top:1px solid var(--slate-100);background:#fff}
+footer strong{color:var(--teal-900)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🌦️ CIDU Weather Portal</h1>
+  <p>Daily localized weather updates &amp; farming advisories for VCDP communities</p>
+  <span class="ai-pill">✨ AI-Powered Climate Assistant</span>
+</div>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>Get Today's Advisory</h2>
+    <div class="form-row">
+      <div><label>State</label>
+        <select id="p-state" onchange="loadPortalLGAs()"><option value="">— Select State —</option></select></div>
+      <div><label>LGA</label><select id="p-lga"><option value="">— Select LGA —</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><label>Language</label>
+        <select id="p-lang">
+          <option value="en">English</option><option value="ha">Hausa</option>
+          <option value="ig">Igbo</option><option value="yo">Yoruba</option>
+          <option value="pcm">Pidgin</option><option value="nup">Nupe</option>
+        </select></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn btn-primary" onclick="getAdvisory()">📡 Get Today's Advisory</button></div>
+    </div>
+    <div class="error-box" id="p-error"></div>
+    <div class="result" id="p-result">
+      <div class="temp" id="p-temp">—</div>
+      <div class="sub" id="p-sub">—</div>
+      <div class="advisory" id="p-advisory">—</div>
+      <div class="fb-row">
+        <button class="fb-btn yes" id="fb-yes" onclick="sendFeedback(true)">👍 Useful</button>
+        <button class="fb-btn no" id="fb-no" onclick="sendFeedback(false)">👎 Not Useful</button>
+      </div>
+      <div class="fb-thanks" id="fb-thanks">Thank you for your feedback! 🙏</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💬 Ask the Weather Assistant <span class="ai-pill" style="background:var(--teal-50);color:var(--teal-900);border-color:#cdeaea">✨ AI-Powered</span></h2>
+    <div class="chat-box" id="chat-box">
+      <div class="msg bot">Hello! 👋 I'm the CIDU weather assistant. Ask me things like "weather in Bida today" or "will it rain in Doma?", or use the selectors above.</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask about today's weather..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-primary" style="width:auto" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div><strong>VCDP Climate Information Dissemination &amp; Use (CIDU)</strong></div>
+  <div>CIDU – AI-Powered Climate Information &amp; Advisory Platform</div>
+  <div>Weather Data: Nigerian Meteorological Agency (NiMet) &amp; Automatic Weather Stations</div>
+  <div>Implemented by <strong>Green Allied Nigeria Limited</strong></div>
+  <div>Powered by <strong>Noblen Technologies Limited</strong></div>
+</footer>
+
+<script>
+var VCDP_STATES = [];
+var lastQuery = {state:"", lga:""};
+
+function loadPortalStates(){
+  fetch("/api/portal/states").then(function(r){return r.json();}).then(function(d){
+    VCDP_STATES = d.states || [];
+    var sel = document.getElementById("p-state");
+    VCDP_STATES.forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;sel.appendChild(o);});
+  });
+}
+function loadPortalLGAs(){
+  var state = document.getElementById("p-state").value;
+  var sel = document.getElementById("p-lga");
+  sel.innerHTML = '<option value="">— Select LGA —</option>';
+  if(!state) return;
+  fetch("/api/portal/lgas?state="+encodeURIComponent(state)).then(function(r){return r.json();}).then(function(d){
+    (d.lgas||[]).forEach(function(l){var o=document.createElement("option");o.value=l;o.textContent=l;sel.appendChild(o);});
+  });
+}
+function showError(msg){
+  var e=document.getElementById("p-error"); e.textContent=msg; e.classList.add("show");
+  document.getElementById("p-result").classList.remove("show");
+}
+function getAdvisory(){
+  var state=document.getElementById("p-state").value, lga=document.getElementById("p-lga").value, lang=document.getElementById("p-lang").value;
+  document.getElementById("p-error").classList.remove("show");
+  if(!state||!lga){showError("Please select both State and LGA.");return;}
+  lastQuery = {state:state, lga:lga};
+  fetch("/api/portal/weather?state="+encodeURIComponent(state)+"&lga="+encodeURIComponent(lga)+"&lang="+lang)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showError(d.error);return;}
+      document.getElementById("p-temp").textContent = d.temperature_c+"°C";
+      document.getElementById("p-sub").textContent = lga+", "+state+" · "+d.rainfall_mm+"mm rain · "+d.alert+(d.updated?(" · Updated "+d.updated):"");
+      document.getElementById("p-advisory").textContent = d.advisory || "No advisory available right now.";
+      document.getElementById("p-result").classList.add("show");
+      document.getElementById("fb-yes").classList.remove("picked");
+      document.getElementById("fb-no").classList.remove("picked");
+      document.getElementById("fb-thanks").style.display="none";
+    })
+    .catch(function(){showError("Could not reach the weather service. Please try again.");});
+}
+function sendFeedback(useful){
+  if(!lastQuery.state){return;}
+  document.getElementById(useful?"fb-yes":"fb-no").classList.add("picked");
+  var fd=new FormData();
+  fd.append("state",lastQuery.state); fd.append("lga",lastQuery.lga); fd.append("useful",useful?"true":"false");
+  fetch("/api/portal/feedback",{method:"POST",body:fd}).then(function(){
+    document.getElementById("fb-thanks").style.display="block";
+  });
+}
+function addChatMsg(text, who){
+  var box=document.getElementById("chat-box");
+  var div=document.createElement("div"); div.className="msg "+who; div.textContent=text;
+  box.appendChild(div); box.scrollTop=box.scrollHeight;
+}
+function sendChat(){
+  var input=document.getElementById("chat-input");
+  var msg=input.value.trim();
+  if(!msg) return;
+  addChatMsg(msg,"user"); input.value="";
+  var fd=new FormData();
+  fd.append("message",msg); fd.append("state",document.getElementById("p-state").value); fd.append("lga",document.getElementById("p-lga").value);
+  fetch("/api/portal/chat",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    addChatMsg(d.reply,"bot");
+    if(d.state) document.getElementById("p-state").value=d.state;
+  }).catch(function(){addChatMsg("Sorry, I couldn't reach the weather service just now.","bot");});
+}
+loadPortalStates();
+</script>
+</body>
+</html>

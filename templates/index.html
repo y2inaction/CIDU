@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCDP CIDU — Climate Information Dissemination & Use</title>
+<style>
+:root{--teal:#008B8B;--dark:#006666;--teal-900:#004D4D;--teal-50:#F0FAFA;
+  --emerald:#059669;--rose:#E11D48;--sky:#0284C7;--amber:#D97706;--purple:#7C3AED;
+  --slate-900:#0F172A;--slate-700:#334155;--slate-500:#64748B;--slate-300:#CBD5E1;
+  --slate-100:#F1F5F9;--slate-50:#F8FAFC;--white:#FFFFFF;
+  --radius:12px;--radius-lg:18px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow:0 4px 16px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--slate-50);color:var(--slate-900);min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:linear-gradient(135deg,var(--teal),var(--dark));color:#fff;padding:.9rem 2rem;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.hdr-inner{max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.hdr-inner{flex-direction:column;gap:.6rem;text-align:center}
+.hdr-inner{max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.hdr-inner{flex-direction:column;gap:.6rem;text-align:center}
+.logo-sec{display:flex;align-items:center;gap:.9rem}
+.logo-sec img{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.5)}
+.logo-sec h1{font-size:1.35rem;font-weight:700}
+.logo-sec p{opacity:.85;font-size:.8rem}
+.usr{text-align:right;font-size:.82rem}
+.usr a{color:rgba(255,255,255,.8);text-decoration:none}
+.usr a:hover{color:#fff}
+.usr{text-align:center}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.85rem;margin-bottom:1.75rem}
+.kpi{background:#fff;border-radius:var(--radius);padding:1rem 1.1rem;border:1px solid var(--slate-100);box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:transform .2s;cursor:help}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--teal))}
+.kpi-icon{font-size:1.3rem;margin-bottom:.4rem}
+/* Tooltip */
+.kpi::after{
+  content:attr(data-tip);
+  position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(6px);
+  background:var(--slate-900);color:#fff;font-size:.72rem;font-weight:500;line-height:1.4;
+  padding:.55rem .75rem;border-radius:8px;width:220px;text-align:left;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .15s ease,transform .15s ease;
+  z-index:50;text-transform:none;letter-spacing:normal;
+}
+.kpi:hover::after,.kpi:focus::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.kpi:nth-child(-n+4)::after{bottom:auto;top:calc(100% + 8px)}
+.kpi:nth-child(-n+4):hover::after{transform:translateX(-50%) translateY(0)}
+@media(max-width:768px){
+  .kpi::after{width:170px;font-size:.68rem}
+}
+.kpi-val{font-size:1.75rem;font-weight:700;color:var(--slate-900);line-height:1;margin-bottom:.25rem}
+.kpi-lbl{font-size:.68rem;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.4px}
+/* DASH SHELL */
+.dash-shell{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid var(--slate-100);overflow:hidden}
+/* TAB NAV */
+.tab-nav{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--slate-50);border-bottom:1px solid var(--slate-300);padding:0 1rem}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{display:flex;align-items:center;gap:.4rem;padding:.9rem 1rem;border:none;background:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;color:var(--slate-500);white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab-btn:hover{color:var(--teal);background:var(--teal-50)}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);background:#fff}
+.tab-btn.bc-btn{color:#fff!important;background:linear-gradient(135deg,var(--dark),var(--teal))!important;border-radius:8px;margin:auto .25rem;padding:.55rem 1rem;border-bottom:none!important}
+.tab-btn.bc-btn.active{background:linear-gradient(135deg,var(--teal-900),var(--dark))!important;border-bottom:none!important}
+.ai-pill{display:inline-block;background:linear-gradient(135deg,#7C3AED,#0284C7);color:#fff;font-size:.58rem;font-weight:700;letter-spacing:.4px;padding:.12rem .4rem;border-radius:999px;margin-left:.3rem;vertical-align:middle;text-transform:uppercase}
+/* PANES */
+.tab-pane{display:none;padding:2rem;animation:fadeIn .2s ease}
+.tab-pane.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.pane-title{font-size:1.1rem;font-weight:700;color:var(--slate-900);margin-bottom:.3rem}
+.pane-sub{font-size:.83rem;color:var(--slate-500);margin-bottom:1.5rem;line-height:1.6}
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem}
+.fg{display:flex;flex-direction:column;gap:.35rem}
+.fg label{font-size:.72rem;font-weight:700;color:var(--slate-700);text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select{padding:.65rem .9rem;border:1.5px solid var(--slate-300);border-radius:9px;font-family:inherit;font-size:.875rem;color:var(--slate-900);background:#fff;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-right:2.2rem;cursor:pointer}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,139,139,.1)}
+/* BUTTONS */
+.btn-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.45rem;padding:.65rem 1.3rem;border:none;border-radius:9px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,139,139,.3)}
+.btn-outline{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}.btn-outline:hover{background:var(--teal-50)}
+.btn-amber{background:#FFFBEB;color:var(--amber);border:1.5px solid #FDE68A}.btn-amber:hover{background:var(--amber);color:#fff}
+.btn-danger{background:#FEF2F2;color:var(--rose);border:1.5px solid #FECACA}.btn-danger:hover{background:var(--rose);color:#fff}
+.btn-lg{padding:.85rem 1.75rem;font-size:.95rem}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--slate-300);border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--slate-50)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--teal);background:var(--teal-50)}
+.upload-zone.has-file{border-color:var(--emerald);background:#ECFDF5}
+.upload-zone.has-file .uz-text{color:var(--emerald);font-weight:700}
+.uz-icon{font-size:2rem;margin-bottom:.5rem}.uz-text{font-size:.85rem;color:var(--slate-500)}
+.uz-hint{font-size:.73rem;color:var(--slate-500);margin-top:.25rem}
+/* OUTPUT BOX */
+.out-box{margin-top:1.25rem;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--slate-300);display:none}
+.out-header{background:var(--slate-50);border-bottom:1px solid var(--slate-300);padding:.6rem 1rem;font-size:.72rem;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.5px}
+.out-body{padding:1rem;background:#fff;font-family:'Courier New',monospace;font-size:.8rem;color:var(--slate-700);white-space:pre-wrap;max-height:300px;overflow-y:auto;line-height:1.7}
+.out-box.ok .out-header{background:#ECFDF5;border-color:#A7F3D0;color:var(--emerald)}
+.out-box.ok .out-body{background:#F0FDF4;color:#14532D}
+.out-box.err .out-header{background:#FEF2F2;border-color:#FECACA;color:var(--rose)}
+.out-box.err .out-body{background:#FFF5F5;color:#7F1D1D}
+.out-box.info .out-header{background:#EFF6FF;border-color:#BFDBFE;color:var(--sky)}
+.out-box.info .out-body{background:#F0F9FF;color:#0C4A6E}
+/* BROADCAST */
+.bc-hero{background:linear-gradient(135deg,var(--teal-900),var(--dark));border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem}
+.bc-hero-icon{font-size:2.5rem;flex-shrink:0}.bc-hero-title{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.bc-hero-desc{font-size:.82rem;color:rgba(255,255,255,.8);line-height:1.6}
+.bc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem}
+.bc-card{background:#fff;border:1.5px solid var(--slate-300);border-radius:var(--radius);padding:1.25rem}
+.bc-card-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--slate-500);margin-bottom:.75rem}
+.bc-preview{background:var(--teal-50);border:1.5px solid #B2DFDF;border-radius:var(--radius);padding:1.1rem;margin-bottom:1.25rem;display:none}
+.bc-preview-title{font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--dark);margin-bottom:.6rem}
+.bc-preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.5rem}
+.bc-stat{background:#fff;border-radius:9px;padding:.65rem .85rem;text-align:center;border:1px solid #B2DFDF}
+.bc-stat-val{font-size:1.25rem;font-weight:700;color:var(--dark)}.bc-stat-lbl{font-size:.68rem;color:var(--slate-500);text-transform:uppercase;letter-spacing:.3px}
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;margin-top:1.25rem}
+.chart-card{background:#fff;border:1.5px solid var(--slate-100);border-radius:var(--radius);padding:1.25rem}
+.lga-state-block{background:#fff;border:1.5px solid var(--slate-100);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:.75rem}
+.lga-state-name{font-weight:700;font-size:.85rem;color:var(--slate-700);margin-bottom:.6rem}
+.lga-chip-row{display:flex;flex-wrap:wrap;gap:.5rem}
+.lga-chip{display:inline-flex;align-items:center;gap:.4rem;background:var(--teal-50,#F0FDFA);color:var(--teal);border:1px solid #99D8D8;border-radius:20px;padding:.3rem .7rem;font-size:.78rem;font-weight:600}
+.lga-chip button{background:none;border:none;color:var(--rose);cursor:pointer;font-size:.85rem;line-height:1;padding:0;font-weight:700}
+.lga-chip button:hover{transform:scale(1.2)}
+.lga-empty{color:var(--slate-400);font-size:.82rem;font-style:italic}
+.chart-title{font-size:.78rem;font-weight:700;color:var(--slate-700);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
+.info-dot{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;background:var(--slate-300);color:#fff;
+  font-size:.65rem;font-weight:700;font-style:italic;cursor:help;position:relative;
+  text-transform:none;letter-spacing:normal;flex-shrink:0;
+}
+.info-dot:hover{background:var(--teal)}
+.info-dot::after{
+  content:attr(data-tip);
+  position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%) translateY(6px);
+  background:var(--slate-900);color:#fff;font-size:.72rem;font-weight:500;line-height:1.4;
+  padding:.55rem .75rem;border-radius:8px;width:200px;text-align:left;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .15s ease,transform .15s ease;z-index:50;
+}
+.info-dot:hover::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.bar-row{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:.5rem;margin-bottom:.45rem}
+.bar-lbl{font-size:.75rem;font-weight:600;color:var(--slate-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:16px;background:var(--slate-100);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+.bar-num{font-size:.74rem;font-weight:700;color:var(--slate-500);text-align:right}
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2.5px solid rgba(0,139,139,.2);border-top-color:var(--teal);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:.4rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* MAIN */
+.main{max-width:1440px;margin:0 auto;padding:1.75rem 2rem;flex:1;width:100%}
+/* FOOTER */
+footer{background:#fff;border-top:1px solid var(--slate-300);padding:1rem 2rem;text-align:center;font-size:.73rem;color:var(--slate-500);line-height:1.9}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hdr{padding:0 1rem}.hdr-inner{height:auto;padding:.75rem 0;flex-wrap:wrap;gap:.5rem}
+  .main{padding:1rem}.kpi-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem}
+  .tab-pane{padding:1.25rem}.form-grid{grid-template-columns:1fr}.btn-row{flex-direction:column}.btn{justify-content:center}.charts-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.kpi-val{font-size:1.4rem}.tab-btn{padding:.75rem .6rem;font-size:.72rem}}
+</style>
+</head>
+<body data-user-role="{{ role }}" data-user-state="{{ user_state or '' }}">
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="logo-sec">
+      <img src="data:image/jpeg;base64,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" alt="VCDP Logo">
+      <div>
+        <h1>VCDP CIDU Dashboard</h1>
+        <p>Climate Information Dissemination & Use &nbsp;|&nbsp; FGN / IFAD-VCDP</p>
+      </div>
+    </div>
+    <div class="usr">
+      <div id="sms-bal">SMS Balance: Loading...</div>
+      <div id="last-upd">Last Update: —</div>
+      <div style="margin-top:.25rem">
+        👤 {{ username }}
+        <span style="opacity:.7">({% if role == 'owner' %}PROGRAMME ADMINISTRATOR{% elif role == 'admin' %}NPMU ADMIN{% elif role == 'spmu' %}SPMU{% elif role == 'extension_agent' %}EXTENSION AGENT{% elif role == 'climate_champion' %}CLIMATE CHAMPION{% else %}{{ role|upper }}{% endif %}{% if user_state %} · {{ user_state }}{% endif %})</span>
+        &nbsp;|&nbsp;<a href="/logout">Sign out</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:#008B8B" data-tip="Total number of beneficiaries registered in the VCDP CIDU database across all programme states and LGAs."><div class="kpi-icon">👥</div><div class="kpi-val" id="k-total">—</div><div class="kpi-lbl">Total Beneficiaries</div></div>
+    <div class="kpi" style="--accent:#059669" data-tip="Beneficiaries who have completed verification and are actively receiving weather SMS alerts through the Climate Information Dissemination & Use."><div class="kpi-icon">✅</div><div class="kpi-val" id="k-onboarded">—</div><div class="kpi-lbl">CIDU Onboarded</div></div>
+    <div class="kpi" style="--accent:#0284C7" data-tip="Beneficiaries whose phone numbers have been confirmed via a verification SMS reply."><div class="kpi-icon">📱</div><div class="kpi-val" id="k-verified">—</div><div class="kpi-lbl">Numbers Verified</div></div>
+    <div class="kpi" style="--accent:#0284C7" data-tip="Beneficiaries who have given consent (opted in) to receive SMS weather alerts under NDPA 2023."><div class="kpi-icon">📨</div><div class="kpi-val" id="k-optedin">—</div><div class="kpi-lbl">Opted-In SMS</div></div>
+    <div class="kpi" style="--accent:#D97706" data-tip="Total weather alert SMS messages dispatched today across Broadcast and Weather SMS."><div class="kpi-icon">📤</div><div class="kpi-val" id="k-today">—</div><div class="kpi-lbl">SMS Sent Today</div></div>
+    <div class="kpi" style="--accent:#059669" data-tip="Percentage of all SMS sent that were successfully delivered by the gateway (Successful ÷ Total Sent)."><div class="kpi-icon">📊</div><div class="kpi-val" id="k-rate">—</div><div class="kpi-lbl">Success Rate</div></div>
+    <div class="kpi" style="--accent:#008B8B" data-tip="Number of programme states with at least one registered beneficiary."><div class="kpi-icon">🗺️</div><div class="kpi-val" id="k-states">—</div><div class="kpi-lbl">States Covered</div></div>
+    <div class="kpi" style="--accent:#4DB8B8" data-tip="Number of distinct Local Government Areas (LGAs) with at least one registered beneficiary."><div class="kpi-icon">📍</div><div class="kpi-val" id="k-lgas">—</div><div class="kpi-lbl">LGAs Covered</div></div>
+    <div class="kpi" style="--accent:#0284C7" data-tip="Active Extension Agents enrolled in the CIDU programme, assigned to LGAs and clusters to disseminate climate advisories."><div class="kpi-icon">🧑‍🌾</div><div class="kpi-val" id="k-agents">—</div><div class="kpi-lbl">Extension Agents</div></div>
+    <div class="kpi" style="--accent:#D97706" data-tip="Active Climate Champions — community-level multipliers trained to forward climate information to fellow farmers."><div class="kpi-icon">⭐</div><div class="kpi-val" id="k-champions">—</div><div class="kpi-lbl">Climate Champions</div></div>
+    <div class="kpi" style="--accent:#2563EB" data-tip="Total number of male beneficiaries registered in the programme."><div class="kpi-icon">👨</div><div class="kpi-val" id="k-male">—</div><div class="kpi-lbl">Male Beneficiaries</div></div>
+    <div class="kpi" style="--accent:#DB2777" data-tip="Total number of female beneficiaries registered in the programme."><div class="kpi-icon">👩</div><div class="kpi-val" id="k-female">—</div><div class="kpi-lbl">Female Beneficiaries</div></div>
+    <div class="kpi" style="--accent:#3B82F6" data-tip="Male beneficiaries aged 15–35, tracked for youth-inclusion reporting to IFAD."><div class="kpi-icon">👦</div><div class="kpi-val" id="k-ymale">—</div><div class="kpi-lbl">Young Male (15-35)</div></div>
+    <div class="kpi" style="--accent:#BE185D" data-tip="Female beneficiaries aged 15–35, tracked for youth-inclusion reporting to IFAD."><div class="kpi-icon">👧</div><div class="kpi-val" id="k-yfemale">—</div><div class="kpi-lbl">Young Female (15-35)</div></div>
+    <div class="kpi" style="--accent:#D97706" data-tip="Beneficiaries who have self-identified as Persons With Disabilities (PWD), tracked for inclusion reporting."><div class="kpi-icon">♿</div><div class="kpi-val" id="k-pwd">—</div><div class="kpi-lbl">PWD Beneficiaries</div></div>
+    <div class="kpi" style="--accent:#7C3AED" data-tip="Beneficiaries located in an LGA with an active Tuya FJ3395 Automatic Weather Station (AWS) providing live local weather readings."><div class="kpi-icon">🛰️</div><div class="kpi-val" id="k-aws">—</div><div class="kpi-lbl">AWS Coverage</div></div>
+    <div class="kpi" style="--accent:#059669" data-tip="Automatic Weather Stations currently online out of the total registered for your scope."><div class="kpi-icon">📡</div><div class="kpi-val"><span id="mk-stations-online">—</span>/<span id="mk-stations-total">—</span></div><div class="kpi-lbl">AWS Stations Online</div></div>
+    <div class="kpi" style="--accent:#059669" data-tip="Beneficiaries with an 'Active' status in the system, eligible for SMS dispatch and reporting."><div class="kpi-icon">🟢</div><div class="kpi-val" id="k-active">—</div><div class="kpi-lbl">Active Status</div></div>
+    <div class="kpi" style="--accent:#008B8B" data-tip="Beneficiaries registered under the Producer category — farmers engaged in primary production of Rice or Cassava."><div class="kpi-icon">🌾</div><div class="kpi-val" id="k-producer">—</div><div class="kpi-lbl">Producers</div></div>
+    <div class="kpi" style="--accent:#D97706" data-tip="Beneficiaries registered under the Processor category — those who process raw Rice or Cassava into market-ready products."><div class="kpi-icon">⚙️</div><div class="kpi-val" id="k-processor">—</div><div class="kpi-lbl">Processors</div></div>
+    <div class="kpi" style="--accent:#7C3AED" data-tip="Beneficiaries registered under the Marketer category — those involved in selling and distributing Rice or Cassava products."><div class="kpi-icon">🛒</div><div class="kpi-val" id="k-marketer">—</div><div class="kpi-lbl">Marketers</div></div>
+  </div>
+
+  <div class="dash-shell">
+    <nav class="tab-nav" id="tab-nav">
+      <button class="tab-btn active" data-tab="import">📥 Import CSV</button>
+      <button class="tab-btn" data-tab="verify">📱 Verify Numbers</button>
+      <button class="tab-btn bc-btn" data-tab="broadcast">🚀 Broadcast SMS</button>
+      <button class="tab-btn" data-tab="send">📤 Weather SMS <span class="ai-pill">✨ AI-Powered</span></button>
+      <button class="tab-btn" data-tab="whatsapp">🟢 Weather WhatsApp <span class="ai-pill">✨ AI-Powered</span></button>
+      <button class="tab-btn" data-tab="custom-message">💬 Custom Message</button>
+      <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
+      <button class="tab-btn" data-tab="reports">📁 Reports</button>
+      {% if role in ('owner','admin','spmu','aws_supplier') %}<button class="tab-btn" data-tab="stations">🛰️ AWS Stations</button>{% endif %}
+      {% if role in ('owner','admin','spmu','extension_agent','climate_champion') %}<button class="tab-btn" data-tab="fieldreports">📝 Field Reports &amp; Feedback</button>{% endif %}
+      {% if role in ('owner','admin','spmu') %}<button class="tab-btn" data-tab="team">👤 Team</button>{% endif %}
+    </nav>
+
+    <!-- IMPORT -->
+    <div class="tab-pane active" id="tab-import">
+      <p class="pane-title">Import Beneficiaries</p>
+      <p class="pane-sub">Upload a CSV or Excel file matching the simplified template below. Duplicates (by phone number) are skipped automatically. Only programme states, LGAs, crops and roles are accepted.</p>
+      <div class="btn-row" style="margin-top:0;margin-bottom:1.25rem">
+        <a href="/download_template" class="btn btn-outline">⬇ Download CSV Template</a>
+        <a href="/download_template_xlsx" class="btn btn-outline">⬇ Download Excel Template</a>
+      </div>
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('csv-file').click()">
+        <input type="file" id="csv-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(this)">
+        <div class="uz-icon">📄</div>
+        <div class="uz-text" id="uz-text">Click to select a file or drag &amp; drop here</div>
+        <div class="uz-hint">.csv, .xlsx, or .xls — whichever is easiest for you</div>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary btn-lg" onclick="importCSV()">⚡ Upload &amp; Process</button></div>
+      <div class="out-box" id="imp-out"><div class="out-header">Import Result</div><div class="out-body" id="imp-body"></div></div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="tab-pane" id="tab-verify">
+      <p class="pane-title">Verify Phone Numbers</p>
+      <p class="pane-sub">Send a one-time verification SMS to opted-in, unverified beneficiaries.</p>
+      <div class="form-grid">
+        <div class="fg"><label>State</label>
+          <select id="v-state" onchange="loadLGAs('v-state','v-lga')"><option value="">— Select State —</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+</select></div>
+        <div class="fg"><label>LGA</label><select id="v-lga"><option value="">— Select LGA —</option></select></div>
+        <div class="fg"><label>Role (optional)</label>
+          <select id="v-role"><option value="">All Roles</option><option>Producer</option><option>Processor</option><option>Marketer</option></select></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary btn-lg" onclick="verifyPhones()">📲 Send Verification SMS</button></div>
+      <div class="out-box" id="v-out"><div class="out-header">Result</div><div class="out-body" id="v-body"></div></div>
+    </div>
+
+    <!-- BROADCAST -->
+    <div class="tab-pane" id="tab-broadcast">
+      <div class="bc-hero">
+        <div class="bc-hero-icon">🚀</div>
+        <div><div class="bc-hero-title">One-Click Weather Broadcast</div>
+          <div class="bc-hero-desc">Sends tailored weather alerts to ALL onboarded beneficiaries across all programme LGAs. Each beneficiary receives a message matched to their role and language.</div>
+        </div>
+      </div>
+      <div class="bc-cards">
+        <div class="bc-card"><div class="bc-card-title">Language</div>
+          <div class="fg"><label>Select broadcast language</label>
+            <select id="bc-lang"><option value="en">English</option><option value="ha">Hausa</option><option value="ig">Igbo</option><option value="nup">Nupe</option><option value="pcm">Pidgin</option><option value="yo">Yoruba</option></select></div>
+        </div>
+        <div class="bc-card"><div class="bc-card-title">Coverage</div>
+          <div style="font-size:.82rem;color:#64748B;line-height:1.9">All onboarded beneficiaries<br>Role-tailored messages per LGA<br>Live weather per location<br>Full SMS audit log</div>
+        </div>
+      </div>
+      <div class="bc-preview" id="bc-preview">
+        <div class="bc-preview-title">Pre-Broadcast Summary</div>
+        <div class="bc-preview-grid" id="bc-grid"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-amber btn-lg" onclick="previewBroadcast()">👁 Preview</button>
+        <button class="btn btn-danger btn-lg" id="bc-send-btn" style="display:none" onclick="runBroadcast()">🚀 SEND NOW — Broadcast to All</button>
+      </div>
+      <div class="out-box" id="bc-out"><div class="out-header">Broadcast Result</div><div class="out-body" id="bc-body"></div></div>
+    </div>
+
+    <!-- WEATHER SMS -->
+    <div class="tab-pane" id="tab-send">
+      <p class="pane-title">Weather Alert Dispatch <span class="ai-pill">✨ AI-Powered</span></p>
+      <p class="pane-sub">Send location-specific weather alerts to a targeted state and LGA.</p>
+      <div class="form-grid">
+        <div class="fg"><label>State</label>
+          <select id="s-state" onchange="loadLGAs('s-state','s-lga')"><option value="">— Select State —</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+</select></div>
+        <div class="fg"><label>LGA</label><select id="s-lga"><option value="">— Select LGA —</option></select></div>
+        <div class="fg"><label>Role</label>
+          <select id="s-role"><option value="">All Roles</option><option>Producer</option><option>Processor</option><option>Marketer</option></select></div>
+        <div class="fg"><label>Language</label>
+          <select id="s-lang"><option value="en">English</option><option value="ha">Hausa</option><option value="ig">Igbo</option><option value="nup">Nupe</option><option value="pcm">Pidgin</option><option value="yo">Yoruba</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-lg" onclick="previewSMS()">👁 Preview</button>
+        <button class="btn btn-primary btn-lg" onclick="sendWeatherSMS()">📤 Send to Onboarded</button>
+      </div>
+      <div class="out-box" id="s-out"><div class="out-header">Result</div><div class="out-body" id="s-body"></div></div>
+    </div>
+
+    <!-- WEATHER WHATSAPP -->
+    <div class="tab-pane" id="tab-whatsapp">
+      <p class="pane-title">Weather WhatsApp Dispatch <span class="ai-pill">✨ AI-Powered</span></p>
+      <p class="pane-sub">Generate the same localized weather advisory for WhatsApp delivery — per-recipient chat links or a copy-ready broadcast list. Advisories support up to 306 characters (2 SMS pages).</p>
+      <div class="form-grid">
+        {% if role in ('spmu','extension_agent','climate_champion') %}
+        <div class="fg"><label>State</label><div style="padding:10px;background:#f5f5f5;border-radius:6px;color:#666">{{ user_state }}</div>
+          <input type="hidden" id="wa-state" value="{{ user_state }}"></div>
+        {% else %}
+        <div class="fg"><label>State</label>
+          <select id="wa-state" onchange="loadLGAs('wa-state','wa-lga')"><option value="">— Select State —</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+          </select></div>
+        {% endif %}
+        <div class="fg"><label>LGA</label><select id="wa-lga"><option value="">— Select LGA —</option></select></div>
+        <div class="fg"><label>Role</label>
+          <select id="wa-role"><option value="">All Roles</option><option>Producer</option><option>Processor</option><option>Marketer</option></select></div>
+        <div class="fg"><label>Language</label>
+          <select id="wa-lang"><option value="en">English</option><option value="ha">Hausa</option><option value="ig">Igbo</option><option value="nup">Nupe</option><option value="pcm">Pidgin</option><option value="yo">Yoruba</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-lg" onclick="waGenerate(true)">👁 Preview Advisory</button>
+        <button class="btn btn-primary btn-lg" style="background:#25D366;border-color:#25D366" onclick="waGenerate(false)">🟢 Generate WhatsApp Broadcast</button>
+      </div>
+      <div class="out-box" id="wa-out"><div class="out-header">WhatsApp Broadcast</div><div class="out-body" id="wa-body"></div></div>
+    </div>
+
+    <!-- CUSTOM MESSAGE (Owner/NPMU/SPMU) -->
+    <div class="tab-pane" id="tab-custom-message">
+      <p class="pane-title">Send Custom Message to Beneficiaries</p>
+      <p class="pane-sub">Compose and send a custom SMS message to opted-in beneficiaries.</p>
+      <div class="form-grid">
+        <div class="fg" id="state-field" style="display:none;"><label>State</label>
+          <select id="cm-state" onchange="loadLGAs('cm-state','cm-lga')"><option value="">— Select State —</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+          </select></div>
+        <div class="fg" id="state-display" style="display:none;"><label>State</label><div style="padding:10px;background:#f5f5f5;border-radius:4px;color:#666;" id="spmu-state-name"></div></div>
+        <div class="fg"><label>LGA (Optional — leave blank for entire state)</label><select id="cm-lga"><option value="">All LGAs</option></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="fg"><label>Your Message (Max 306 characters — 2 SMS pages)</label>
+          <textarea id="cm-message" placeholder="Type your message here..." style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px;resize:vertical;height:80px;" onkeyup="updateCharCount()"></textarea>
+          <div style="font-size:12px;color:#888;margin-top:4px;"><span id="char-count">0</span>/306 characters</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-lg" onclick="previewCustomMessage()">👁 Preview</button>
+        <button class="btn btn-success btn-lg" onclick="sendCustomMessage()">💬 Send Custom Message</button>
+      </div>
+      <div class="out-box" id="cm-out"><div class="out-header">Result</div><div class="out-body" id="cm-body"></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="tab-pane" id="tab-analytics">
+      <p class="pane-title">Beneficiary Analytics</p>
+      <p class="pane-sub">Live breakdown of all registered beneficiaries across the programme.</p>
+      <div class="charts-grid">
+        <div class="chart-card"><div class="chart-title">Onboarded by State <span class="info-dot" data-tip="Number of CIDU-onboarded beneficiaries in each programme state.">i</span></div><div id="ch-state"></div></div>
+        <div class="chart-card"><div class="chart-title">By Role <span class="info-dot" data-tip="Breakdown of beneficiaries by their VCDP value-chain role: Producer, Processor, or Marketer.">i</span></div><div id="ch-role"></div></div>
+        <div class="chart-card"><div class="chart-title">Primary Crop <span class="info-dot" data-tip="Breakdown of beneficiaries by their main VCDP value chain crop: Rice or Cassava.">i</span></div><div id="ch-crop"></div></div>
+        <div class="chart-card"><div class="chart-title">Age Group <span class="info-dot" data-tip="Beneficiaries grouped into two bands: 15-35 (youth) and 35-Above, for IFAD youth-inclusion reporting.">i</span></div><div id="ch-age"></div></div>
+        <div class="chart-card"><div class="chart-title">Gender <span class="info-dot" data-tip="Distribution of beneficiaries by gender, including the youth (15-35) sub-totals.">i</span></div><div id="ch-gender"></div></div>
+        <div class="chart-card"><div class="chart-title">Language Preference <span class="info-dot" data-tip="Beneficiaries' preferred SMS language: English, Hausa, Igbo, Nupe, Yoruba, or Pidgin.">i</span></div><div id="ch-lang"></div></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="tab-pane" id="tab-reports">
+      <p class="pane-title">Reports &amp; Audit</p>
+      <p class="pane-sub">Export SMS delivery logs for IFAD compliance reporting.</p>
+      <div class="form-grid">
+        <div class="fg"><label>Filter by State</label>
+          <select id="r-state" onchange="loadLGAs('r-state','r-lga')"><option value="">All States</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+</select></div>
+        <div class="fg"><label>Filter by LGA</label><select id="r-lga"><option value="">All LGAs</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-lg" onclick="exportLogs()">⬇ Export Audit Logs</button>
+        <button class="btn btn-outline btn-lg" onclick="testSMS()">📡 Test SMS Connection</button>
+        <button class="btn btn-outline btn-lg" onclick="testWhatsApp()">🟢 Test WhatsApp Connection</button>
+        <button class="btn btn-outline btn-lg" onclick="seedTemplates()">🌱 Initialize Templates</button>
+      </div>
+      <div class="out-box" id="r-out"><div class="out-header">Result</div><div class="out-body" id="r-body"></div></div>
+
+      <div style="margin-top:2rem;padding-top:1.5rem;border-top:1.5px solid var(--slate-100)">
+        <p class="pane-title" style="color:var(--rose)">Manage Beneficiary Data</p>
+        <p class="pane-sub">Remove beneficiary records and their SMS history — useful for cleaning up a bad import. Choose a State (required) and optionally an LGA. Leaving LGA blank removes records for the <strong>entire state</strong>. This cannot be undone.</p>
+        <div class="form-grid">
+          <div class="fg"><label>State</label>
+            <select id="d-state" onchange="loadLGAs('d-state','d-lga')">
+              <option value="">— Select State —</option>
+              <option value="Anambra State">Anambra State</option>
+              <option value="Benue State">Benue State</option>
+              <option value="Ebonyi State">Ebonyi State</option>
+              <option value="Enugu State">Enugu State</option>
+              <option value="Kogi State">Kogi State</option>
+              <option value="Nasarawa State">Nasarawa State</option>
+              <option value="Niger State">Niger State</option>
+              <option value="Ogun State">Ogun State</option>
+              <option value="Taraba State">Taraba State</option>
+            </select></div>
+          <div class="fg"><label>LGA (optional — leave blank for entire state)</label><select id="d-lga"><option value="">All LGAs in this state</option></select></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-amber btn-lg" onclick="checkDeleteCount()">🔍 Check Record Count</button>
+          <button class="btn btn-danger btn-lg" id="d-delete-btn" style="display:none" onclick="confirmDeleteBeneficiaries()">🗑 Delete These Records</button>
+        </div>
+        <div class="out-box" id="d-out"><div class="out-header">Result</div><div class="out-body" id="d-body"></div></div>
+      </div>
+
+      <div style="margin-top:2rem;padding-top:1.5rem;border-top:1.5px solid var(--slate-100)" id="lga-mgmt-section">
+        <p class="pane-title">Manage Programme LGAs</p>
+        <p class="pane-sub" id="lga-mgmt-sub">As the VCDP programme expands into new Local Government Areas, add them here — they immediately become available in every State/LGA dropdown across the system, and on the downloadable templates.</p>
+
+        <div class="form-grid" id="lga-add-form">
+          <div class="fg"><label>State</label>
+            <select id="lga-add-state">
+              <option value="">— Select State —</option>
+              <option value="Anambra State">Anambra State</option>
+              <option value="Benue State">Benue State</option>
+              <option value="Ebonyi State">Ebonyi State</option>
+              <option value="Enugu State">Enugu State</option>
+              <option value="Kogi State">Kogi State</option>
+              <option value="Nasarawa State">Nasarawa State</option>
+              <option value="Niger State">Niger State</option>
+              <option value="Ogun State">Ogun State</option>
+              <option value="Taraba State">Taraba State</option>
+            </select></div>
+          <div class="fg"><label>New LGA name</label><input type="text" id="lga-add-name" placeholder="e.g. Otukpo"></div>
+        </div>
+        <div class="btn-row" id="lga-add-btn-row">
+          <button class="btn btn-primary btn-lg" onclick="addProgrammeLGA()">➕ Add LGA</button>
+        </div>
+        <div class="out-box" id="lga-out"><div class="out-header">Result</div><div class="out-body" id="lga-body"></div></div>
+
+        <div id="lga-list-container" style="margin-top:1.25rem"></div>
+      </div>
+    </div>
+
+    {% if role in ('owner','admin','spmu','aws_supplier') %}
+    <!-- AWS STATIONS: Automatic Weather Station Health Monitoring -->
+    <div class="tab-pane" id="tab-stations">
+      <p class="pane-title">🛰️ Automatic Weather Station (AWS) Health Monitoring</p>
+      <p class="pane-sub">{% if role == 'aws_supplier' %}Monitor the stations supplied by <strong>{{ user_supplier }}</strong> across every VCDP state.{% elif role == 'spmu' %}Add, remove and check the health of AWS devices in {{ user_state }}.{% else %}Manage AWS devices across all VCDP states — online/offline status, last data received, battery, signal and sensor health.{% endif %}</p>
+
+      <div class="kpi-grid" id="station-kpi-grid" style="margin-bottom:1.25rem">
+        <div class="kpi" style="--accent:#059669"><div class="kpi-icon">🛰️</div><div class="kpi-val" id="sk-total">—</div><div class="kpi-lbl">Total Stations</div></div>
+        <div class="kpi" style="--accent:#059669"><div class="kpi-icon">🟢</div><div class="kpi-val" id="sk-online">—</div><div class="kpi-lbl">Online</div></div>
+        <div class="kpi" style="--accent:#E11D48"><div class="kpi-icon">🔴</div><div class="kpi-val" id="sk-offline">—</div><div class="kpi-lbl">Offline</div></div>
+        <div class="kpi" style="--accent:#D97706"><div class="kpi-icon">🔋</div><div class="kpi-val" id="sk-lowbatt">—</div><div class="kpi-lbl">Low Battery (&lt;20%)</div></div>
+        <div class="kpi" style="--accent:#E11D48"><div class="kpi-icon">⚠️</div><div class="kpi-val" id="sk-faults">—</div><div class="kpi-lbl">Sensor Faults</div></div>
+      </div>
+
+      <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1.5px solid var(--slate-100)">
+        <p class="pane-title" style="font-size:.95rem">Register a New Station</p>
+        <div class="form-grid">
+          {% if role in ('owner','admin','aws_supplier') %}
+          <div class="fg"><label>State</label>
+            <select id="st-add-state" onchange="loadLGAs('st-add-state','st-add-lga')"><option value="">— Select State —</option>
+              <option value="Anambra State">Anambra State</option><option value="Benue State">Benue State</option>
+              <option value="Ebonyi State">Ebonyi State</option><option value="Enugu State">Enugu State</option>
+              <option value="Kogi State">Kogi State</option><option value="Nasarawa State">Nasarawa State</option>
+              <option value="Niger State">Niger State</option><option value="Ogun State">Ogun State</option>
+              <option value="Taraba State">Taraba State</option></select></div>
+          {% else %}
+          <div class="fg"><label>State</label><div style="padding:10px;background:#f5f5f5;border-radius:6px;color:#666">{{ user_state }}</div>
+            <input type="hidden" id="st-add-state" value="{{ user_state }}"></div>
+          {% endif %}
+          <div class="fg"><label>LGA</label><select id="st-add-lga"><option value="">— Select LGA —</option></select></div>
+          <div class="fg"><label>Device ID (Tuya)</label><input type="text" id="st-add-device" placeholder="e.g. bfxxxx-tuya-device-id"></div>
+          <div class="fg"><label>Station / Location Name</label><input type="text" id="st-add-name" placeholder="e.g. Doma Central Station"></div>
+          {% if role in ('owner','admin') %}
+          <div class="fg"><label>Supplier</label><input type="text" id="st-add-supplier" placeholder="Green Allied Nigeria Limited" value="Green Allied Nigeria Limited"></div>
+          {% endif %}
+        </div>
+        <div class="btn-row"><button class="btn btn-primary btn-lg" onclick="addStation()">➕ Register Station</button></div>
+        <div class="out-box" id="st-add-out"><div class="out-header">Result</div><div class="out-body" id="st-add-body"></div></div>
+      </div>
+
+      <p class="pane-title" style="font-size:.95rem">Select a Station to Check Health</p>
+      <div class="form-grid">
+        <div class="fg"><label>Station</label><select id="st-select" onchange="renderStationHealth()"><option value="">— Select a station —</option></select></div>
+      </div>
+      <div id="station-health-card"></div>
+
+      <p class="pane-title" style="font-size:.95rem;margin-top:1.75rem">All Stations</p>
+      <div id="station-list-table"></div>
+    </div>
+    {% endif %}
+
+    {% if role in ('owner','admin','spmu','extension_agent','climate_champion') %}
+    <!-- FIELD REPORTS & FARMER FEEDBACK (IFAD recommendation) -->
+    <div class="tab-pane" id="tab-fieldreports">
+      <p class="pane-title">📝 Field Reports &amp; Farmer Feedback</p>
+      <p class="pane-sub">Per IFAD's recommendation: capture Extension Agent / Climate Champion field reports, track whether farmers followed the advisory, and log farmer feedback on advisory usefulness.</p>
+
+      {% if role in ('extension_agent','climate_champion','spmu') %}
+      <div style="margin-bottom:1.75rem;padding-bottom:1.75rem;border-bottom:1.5px solid var(--slate-100)">
+        <p class="pane-title" style="font-size:.95rem">Submit Field Report</p>
+        <div class="form-grid">
+          {% if role == 'spmu' %}
+          <div class="fg"><label>LGA</label><select id="fr-lga"><option value="">— Select LGA —</option></select></div>
+          {% else %}
+          <div class="fg"><label>LGA</label><div style="padding:10px;background:#f5f5f5;border-radius:6px;color:#666">{{ user_state }}{% if role in ('extension_agent','climate_champion') %} · assigned{% endif %}</div></div>
+          {% endif %}
+          <div class="fg"><label>Cluster</label><input type="text" id="fr-cluster" placeholder="e.g. Doma Rice FO Cluster A"></div>
+          <div class="fg"><label>Report Date</label><input type="text" id="fr-date" placeholder="YYYY-MM-DD (blank = today)"></div>
+          <div class="fg"><label>Farmers Reached</label><input type="text" id="fr-reached" placeholder="0"></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg"><label>Followed the Advice</label><input type="text" id="fr-adopted" placeholder="0"></div>
+          <div class="fg"><label>Partially Followed</label><input type="text" id="fr-partial" placeholder="0"></div>
+          <div class="fg"><label>Did Not Follow</label><input type="text" id="fr-notadopted" placeholder="0"></div>
+        </div>
+        <div class="fg" style="margin-bottom:.75rem"><label>Activities This Visit</label><textarea id="fr-activities" rows="2" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px" placeholder="e.g. Delivered rainfall advisory, demonstrated seed spacing..."></textarea></div>
+        <div class="fg" style="margin-bottom:.75rem"><label>Challenges / Notes</label><textarea id="fr-challenges" rows="2" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px" placeholder="Optional"></textarea></div>
+        <div class="btn-row"><button class="btn btn-primary btn-lg" onclick="submitFieldReport()">✅ Submit Field Report</button></div>
+        <div class="out-box" id="fr-out"><div class="out-header">Result</div><div class="out-body" id="fr-body"></div></div>
+      </div>
+
+      <div style="margin-bottom:1.75rem;padding-bottom:1.75rem;border-bottom:1.5px solid var(--slate-100)">
+        <p class="pane-title" style="font-size:.95rem">Log Farmer Feedback (in-person)</p>
+        <p class="pane-sub">For farmers who don't use the public web portal — log their verbal feedback here during a visit.</p>
+        <div class="form-grid">
+          <div class="fg"><label>Farmer Name</label><input type="text" id="fb-name" placeholder="Optional"></div>
+          <div class="fg"><label>Farmer Phone</label><input type="text" id="fb-phone" placeholder="Optional"></div>
+        </div>
+        <div class="fg" style="margin-bottom:.75rem"><label>Comment</label><input type="text" id="fb-comment" placeholder="Optional"></div>
+        <div class="btn-row">
+          <button class="btn btn-outline btn-lg" onclick="logFeedback(true)">👍 Advisory Was Useful</button>
+          <button class="btn btn-outline btn-lg" onclick="logFeedback(false)">👎 Not Useful</button>
+        </div>
+        <div class="out-box" id="fb-out"><div class="out-header">Result</div><div class="out-body" id="fb-body"></div></div>
+      </div>
+      {% endif %}
+
+      <p class="pane-title" style="font-size:.95rem">Farmer Feedback Summary</p>
+      <div class="kpi-grid" id="feedback-kpi-grid" style="margin-bottom:1.25rem">
+        <div class="kpi" style="--accent:#059669"><div class="kpi-icon">👍</div><div class="kpi-val" id="fk-useful">—</div><div class="kpi-lbl">Rated Useful</div></div>
+        <div class="kpi" style="--accent:#E11D48"><div class="kpi-icon">👎</div><div class="kpi-val" id="fk-notuseful">—</div><div class="kpi-lbl">Rated Not Useful</div></div>
+        <div class="kpi" style="--accent:#0284C7"><div class="kpi-icon">📊</div><div class="kpi-val" id="fk-pct">—</div><div class="kpi-lbl">% Useful</div></div>
+      </div>
+      <div id="feedback-list-table"></div>
+
+      <p class="pane-title" style="font-size:.95rem;margin-top:1.75rem">Adoption Tracking Summary</p>
+      <div class="kpi-grid" id="adoption-kpi-grid" style="margin-bottom:1.25rem">
+        <div class="kpi" style="--accent:#059669"><div class="kpi-icon">🌾</div><div class="kpi-val" id="ak-reached">—</div><div class="kpi-lbl">Farmers Reached</div></div>
+        <div class="kpi" style="--accent:#059669"><div class="kpi-icon">✅</div><div class="kpi-val" id="ak-adopted">—</div><div class="kpi-lbl">Followed Advice</div></div>
+        <div class="kpi" style="--accent:#D97706"><div class="kpi-icon">🔶</div><div class="kpi-val" id="ak-partial">—</div><div class="kpi-lbl">Partially Followed</div></div>
+        <div class="kpi" style="--accent:#0284C7"><div class="kpi-icon">📈</div><div class="kpi-val" id="ak-rate">—</div><div class="kpi-lbl">Overall Adoption Rate</div></div>
+      </div>
+      <p class="pane-title" style="font-size:.95rem">Recent Field Reports</p>
+      <div id="fieldreport-list-table"></div>
+    </div>
+    {% endif %}
+
+    {% if role in ('owner','admin','spmu') %}
+    <!-- TEAM: Extension Agents & Climate Champions -->
+    <div class="tab-pane" id="tab-team">
+      <p class="pane-title">Team — Extension Agents &amp; Climate Champions</p>
+      <p class="pane-sub">{% if role == 'spmu' %}Add Extension Agents and Climate Champions for LGAs and clusters in {{ user_state }}. They log in with their own accounts, scoped to your state.{% else %}Manage system users. SPMUs can add Extension Agents and Climate Champions within their own state.{% endif %}</p>
+      <div class="form-grid">
+        <div class="fg"><label>Full Username</label><input type="text" id="tm-username" placeholder="e.g. agent_doma_musa" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px"></div>
+        <div class="fg"><label>Email</label><input type="email" id="tm-email" placeholder="name@example.com" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px"></div>
+        <div class="fg"><label>Password (min 8 characters)</label><input type="text" id="tm-password" placeholder="Temporary password" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px"></div>
+        <div class="fg"><label>Role</label>
+          <select id="tm-role">
+            <option value="extension_agent">Extension Agent</option>
+            <option value="climate_champion">Climate Champion</option>
+            {% if role in ('owner','admin') %}<option value="spmu">SPMU (State Admin)</option>{% endif %}
+          </select></div>
+        {% if role in ('owner','admin') %}
+        <div class="fg"><label>State</label>
+          <select id="tm-state" onchange="loadLGAs('tm-state','tm-lga')"><option value="">— Select State —</option>
+            <option value="Anambra State">Anambra State</option>
+            <option value="Benue State">Benue State</option>
+            <option value="Ebonyi State">Ebonyi State</option>
+            <option value="Enugu State">Enugu State</option>
+            <option value="Kogi State">Kogi State</option>
+            <option value="Nasarawa State">Nasarawa State</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun State">Ogun State</option>
+            <option value="Taraba State">Taraba State</option>
+          </select></div>
+        {% else %}
+        <div class="fg"><label>State</label><div style="padding:10px;background:#f5f5f5;border-radius:6px;color:#666">{{ user_state }}</div></div>
+        {% endif %}
+        <div class="fg"><label>LGA (Assignment)</label><select id="tm-lga"><option value="">— Select LGA —</option></select></div>
+        <div class="fg"><label>Cluster (Optional — FO group / community)</label><input type="text" id="tm-cluster" placeholder="e.g. Doma Rice FO Cluster A" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-lg" onclick="addTeamUser()">➕ Add Team Member</button>
+      </div>
+      <div class="out-box" id="tm-out"><div class="out-header">Result</div><div class="out-body" id="tm-body"></div></div>
+      <div id="tm-list" style="margin-top:1.25rem"></div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<footer>
+  <div><strong>VCDP Climate Information Dissemination &amp; Use (CIDU)</strong></div>
+  <div>CIDU – AI-Powered Climate Information &amp; Advisory Platform</div>
+  <div>Weather Data: Nigerian Meteorological Agency (NiMet) &amp; Automatic Weather Stations</div>
+  <div>Implemented by <strong>Green Allied Nigeria Limited</strong> &nbsp;|&nbsp; Powered by <strong>Noblen Technologies Limited</strong></div>
+  <div style="margin-top:.35rem"><a href="/portal" target="_blank" style="color:var(--teal)">🌦️ Public Weather Portal &amp; Chatbot →</a></div>
+</footer>
+
+<script>
+var LANG_LBL = {en:"English",ha:"Hausa",ig:"Igbo",yo:"Yoruba",pcm:"Pidgin",nup:"Nupe"};
+var CLR = ["#008B8B","#0284C7","#059669","#D97706","#7C3AED","#E11D48","#0891B2","#65A30D"];
+var CURRENT_ROLE = "{{ role }}";
+var CURRENT_STATE = "{{ user_state or '' }}";
+var _LGA_CACHE = {};  // in-memory cache so we don't re-fetch the same state repeatedly
+
+function loadLGAs(stId, lgId, callback){
+  var state = document.getElementById(stId).value;
+  var sel = document.getElementById(lgId);
+  var isAll = lgId.startsWith("r-") || lgId.startsWith("d-");
+  sel.innerHTML = isAll ? '<option value="">All LGAs</option>' : '<option value="">— Select LGA —</option>';
+  if(!state){ if(callback) callback([]); return; }
+
+  function populate(lgas){
+    sel.innerHTML = isAll ? '<option value="">All LGAs</option>' : '<option value="">— Select LGA —</option>';
+    lgas.forEach(function(l){
+      var o = document.createElement("option");
+      o.value = l; o.textContent = l;
+      sel.appendChild(o);
+    });
+    if(callback) callback(lgas);
+  }
+
+  if(_LGA_CACHE[state]){
+    populate(_LGA_CACHE[state]);
+    return;
+  }
+  // Fetch live from database — reflects any LGAs added/removed by Owner/NPMU
+  fetch("/api/lgas?state=" + encodeURIComponent(state))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      _LGA_CACHE[state] = d.lgas || [];
+      populate(_LGA_CACHE[state]);
+    })
+    .catch(function(){ populate([]); });
+}
+
+function clearLGACache(){ _LGA_CACHE = {}; }
+
+function lockStateDropdowns(){
+  if(CURRENT_ROLE !== "spmu" || !CURRENT_STATE) return;
+  ["v-state","s-state","r-state","d-state"].forEach(function(id){
+    var sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = '<option value="'+CURRENT_STATE+'">'+CURRENT_STATE+'</option>';
+    sel.value = CURRENT_STATE;
+    sel.disabled = true;
+    sel.title = "Your account is scoped to "+CURRENT_STATE;
+    var lgaId = id.replace("-state","-lga");
+    loadLGAs(id, lgaId);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  lockStateDropdowns();
+  loadProgrammeLGAs();
+  setupCustomMessageForSPMU();
+  // WhatsApp tab: state-scoped users get their LGAs preloaded (state is fixed)
+  if(["spmu","extension_agent","climate_champion"].indexOf(CURRENT_ROLE)>=0 && CURRENT_STATE){
+    setTimeout(function(){loadLGAs("wa-state","wa-lga");},500);
+  }
+  // Tabs
+  var buttons = document.querySelectorAll(".tab-btn");
+  buttons.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+      document.querySelectorAll(".tab-pane").forEach(function(p){p.classList.remove("active");});
+      btn.classList.add("active");
+      var pane = document.getElementById("tab-"+btn.getAttribute("data-tab"));
+      if(pane) pane.classList.add("active");
+      if(btn.getAttribute("data-tab")==="team") initTeamTab();
+      if(btn.getAttribute("data-tab")==="stations") initStationsTab();
+      if(btn.getAttribute("data-tab")==="fieldreports") initFieldReportsTab();
+    });
+  });
+  // Drag and drop
+  var zone = document.getElementById("drop-zone");
+  zone.addEventListener("dragover",function(e){e.preventDefault();zone.classList.add("dragover");});
+  zone.addEventListener("dragleave",function(){zone.classList.remove("dragover");});
+  zone.addEventListener("drop",function(e){
+    e.preventDefault();zone.classList.remove("dragover");
+    var f=e.dataTransfer.files[0]; if(f) markFile(f.name,f.size);
+  });
+  refreshStats();
+  setInterval(refreshStats, 30000);
+});
+
+function showOut(boxId,bodyId,text,type){
+  var box=document.getElementById(boxId),body=document.getElementById(bodyId);
+  if(!box||!body)return;
+  box.className="out-box "+(type||"info");box.style.display="block";body.textContent=text;
+}
+function showLoading(boxId,bodyId,msg){
+  var box=document.getElementById(boxId),body=document.getElementById(bodyId);
+  if(!box||!body)return;
+  box.className="out-box info";box.style.display="block";
+  body.innerHTML='<span class="spin"></span> '+(msg||"Processing...");
+}
+
+function barChart(cid,data,colorFn){
+  var el=document.getElementById(cid); if(!el)return;
+  var entries=Object.entries(data);
+  var maxV=Math.max.apply(null,entries.map(function(e){return e[1];}).concat([1]));
+  el.innerHTML=entries.map(function(e,i){
+    var k=e[0],v=e[1],pct=Math.max(2,Math.round((v/maxV)*100));
+    return '<div class="bar-row"><div class="bar-lbl" title="'+k+'">'+k+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+colorFn(k,i)+'"></div></div>'+
+      '<div class="bar-num">'+v.toLocaleString()+'</div></div>';
+  }).join("");
+}
+
+function refreshStats(){
+  fetch("/api/stats")
+    .then(function(r){return r.json();})
+    .then(function(d){
+      function set(id,val){var e=document.getElementById(id);if(e)e.textContent=val;}
+      set("k-total",   (d.total_participants||0).toLocaleString());
+      set("k-onboarded",(d.cis_onboarded||0).toLocaleString());
+      set("k-verified", (d.numbers_verified||0).toLocaleString());
+      set("k-optedin",  (d.opted_in_sms||0).toLocaleString());
+      set("k-today",    (d.today_sms||0).toLocaleString());
+      set("k-states",   d.states_covered||0);
+      set("k-agents",   d.extension_agents||0);
+      set("k-champions",d.climate_champions||0);
+      set("k-lgas",     d.lgas_covered||0);
+      set("k-pwd",      (d.pwd_count||0).toLocaleString());
+      set("k-aws",      (d.aws_cluster_count||0).toLocaleString());
+      set("mk-stations-online", d.stations_online||0);
+      set("mk-stations-total",  d.stations_total||0);
+      set("k-active",   (d.active_beneficiaries||0).toLocaleString());
+      var roles=d.by_role||{};
+      set("k-producer",  (roles.Producer||0).toLocaleString());
+      set("k-processor", (roles.Processor||0).toLocaleString());
+      set("k-marketer",  (roles.Marketer||0).toLocaleString());
+      set("k-male",     (d.gender&&d.gender.male||0).toLocaleString());
+      set("k-female",   (d.gender&&d.gender.female||0).toLocaleString());
+      set("k-ymale",    (d.gender&&d.gender.young_male||0).toLocaleString());
+      set("k-yfemale",  (d.gender&&d.gender.young_female||0).toLocaleString());
+      var rate=d.total_sms_sent>0?((d.successful_sms/d.total_sms_sent)*100).toFixed(1)+"%":"—";
+      set("k-rate",rate);
+      var balEl=document.getElementById("sms-bal");
+      if(balEl){
+        if(d.sms_balance){
+          balEl.textContent="SMS Balance: NGN "+(d.sms_balance.balance||0).toLocaleString();
+          balEl.style.display="";
+        } else {
+          balEl.style.display="none";
+        }
+      }
+      var updEl=document.getElementById("last-upd");
+      if(updEl)updEl.textContent="Last Update: "+new Date().toLocaleTimeString();
+      var stMap={};(d.by_state||[]).forEach(function(x){stMap[x.state.replace(" State","")]=x.onboarded;});
+      barChart("ch-state",stMap,function(k,i){return CLR[i%CLR.length];});
+      barChart("ch-role",d.by_role||{},function(k,i){return["#008B8B","#D97706","#059669"][i]||"#008B8B";});
+      barChart("ch-crop",d.by_crop||{},function(k,i){return CLR[i%CLR.length];});
+      barChart("ch-age",d.by_age||{},function(k,i){return CLR[i%CLR.length];});
+      var gdr={Male:d.gender&&d.gender.male||0,Female:d.gender&&d.gender.female||0,
+               "Young Male":d.gender&&d.gender.young_male||0,"Young Female":d.gender&&d.gender.young_female||0};
+      var gc={Male:"#2563EB",Female:"#DB2777","Young Male":"#3B82F6","Young Female":"#BE185D"};
+      barChart("ch-gender",gdr,function(k){return gc[k]||"#008B8B";});
+      var lD={};Object.entries(d.by_language||{}).forEach(function(e){lD[LANG_LBL[e[0]]||e[0]]=e[1];});
+      barChart("ch-lang",lD,function(k,i){return CLR[i%CLR.length];});
+    })
+    .catch(function(e){console.warn("Stats:",e.message);});
+}
+
+function handleFile(input){if(input.files[0])markFile(input.files[0].name,input.files[0].size);}
+function markFile(name,size){
+  var zone=document.getElementById("drop-zone");zone.classList.add("has-file");
+  document.getElementById("uz-text").textContent="File: "+name+" ("+(size/1024).toFixed(1)+" KB)";
+}
+
+function importCSV(){
+  var fi=document.getElementById("csv-file");
+  if(!fi.files.length){alert("Please select a file first.");return;}
+  var file=fi.files[0];
+  var name=file.name.toLowerCase();
+  if(!(name.endsWith(".csv")||name.endsWith(".xlsx")||name.endsWith(".xls"))){
+    showOut("imp-out","imp-body","Unsupported file type. Please select a .csv, .xlsx, or .xls file.","err");
+    return;
+  }
+  if(file.size > 25*1024*1024){
+    showOut("imp-out","imp-body","File is too large (max 25MB). Split it into smaller batches.","err");
+    return;
+  }
+  var fd=new FormData();fd.append("file",file);
+  showLoading("imp-out","imp-body","Importing beneficiaries... this can take a moment for large files, please wait.");
+  fetch("/import_csv",{method:"POST",body:fd})
+    .then(function(r){
+      return r.json().then(function(d){ return {ok:r.ok, status:r.status, data:d}; });
+    })
+    .then(function(res){
+      var d=res.data;
+      if(!res.ok || d.error){
+        var msg="Import failed: "+(d.error||("HTTP "+res.status));
+        if(d.found_headers){msg+="\n\nColumns found in your file:\n"+d.found_headers.join(", ");}
+        showOut("imp-out","imp-body",msg,"err");
+        return;
+      }
+      var txt="Import Complete\n\nImported:  "+d.success+"\nSkipped:   "+d.skipped+" (duplicates)";
+      var errCount=d.error_count!==undefined?d.error_count:(d.errors?d.errors.length:0);
+      if(errCount){
+        txt+="\n\nErrors ("+errCount+"):\n";
+        (d.errors||[]).forEach(function(e){txt+="  - "+e+"\n";});
+      }
+      showOut("imp-out","imp-body",txt,errCount?"info":"ok");
+      fi.value="";document.getElementById("drop-zone").classList.remove("has-file");
+      document.getElementById("uz-text").textContent="Click to select a file or drag & drop here";
+      refreshStats();
+    })
+    .catch(function(e){showOut("imp-out","imp-body","Error: "+e.message+"\n\nIf the file is large, the upload may have timed out. Try a smaller file or check your connection.","err");});
+}
+
+function verifyPhones(){
+  var state=document.getElementById("v-state").value;
+  var lga=document.getElementById("v-lga").value;
+  var role=document.getElementById("v-role").value;
+  if(!state||!lga){alert("Please select both State and LGA.");return;}
+  if(!confirm("Send verification SMS to unverified numbers in "+lga+", "+state+"?"))return;
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);fd.append("role",role);
+  showLoading("v-out","v-body","Sending verification SMS...");
+  fetch("/verify_phones",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      showOut("v-out","v-body","Verification Complete\n\nVerified:  "+d.verified+"\nFailed:    "+d.failed+"\nAttempted: "+d.total_attempted,d.failed===0?"ok":"info");
+      refreshStats();
+    })
+    .catch(function(e){showOut("v-out","v-body","Error: "+e.message,"err");});
+}
+
+function previewBroadcast(){
+  showLoading("bc-out","bc-body","Calculating coverage...");
+  fetch("/api/stats")
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var total=d.cis_onboarded||0;
+      var lang=document.getElementById("bc-lang").value;
+      var scope=(d.by_state||[]).filter(function(s){return s.onboarded>0;}).map(function(s){return s.state.replace(" State","");}).join(", ")||"—";
+      var grid=document.getElementById("bc-grid");
+      grid.innerHTML='<div class="bc-stat"><div class="bc-stat-val">'+total.toLocaleString()+'</div><div class="bc-stat-lbl">Onboarded</div></div>'+
+        '<div class="bc-stat"><div class="bc-stat-val">'+(LANG_LBL[lang]||lang)+'</div><div class="bc-stat-lbl">Language</div></div>'+
+        '<div class="bc-stat"><div class="bc-stat-val">'+scope+'</div><div class="bc-stat-lbl">Coverage</div></div>';
+      document.getElementById("bc-preview").style.display="block";
+      document.getElementById("bc-out").style.display="none";
+      var btn=document.getElementById("bc-send-btn");
+      if(total>0){btn.style.display="inline-flex";btn.textContent="Send NOW — Broadcast to "+total.toLocaleString()+" Beneficiaries";}
+      else{btn.style.display="none";showOut("bc-out","bc-body","No onboarded beneficiaries found. Import and verify first.","info");}
+    })
+    .catch(function(e){showOut("bc-out","bc-body","Error: "+e.message,"err");});
+}
+
+function runBroadcast(){
+  var lang=document.getElementById("bc-lang").value;
+  var btn=document.getElementById("bc-send-btn");
+  if(!confirm("CONFIRM BROADCAST\n\nSend weather SMS to ALL onboarded beneficiaries?\nLanguage: "+(LANG_LBL[lang]||lang)+"\n\nProceed?"))return;
+  btn.disabled=true;btn.textContent="Sending...";
+  showLoading("bc-out","bc-body","Broadcasting — please wait...");
+  var fd=new FormData();fd.append("lang",lang);
+  fetch("/broadcast",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showOut("bc-out","bc-body","Error: "+d.error,"err");btn.disabled=false;return;}
+      showOut("bc-out","bc-body",
+        "BROADCAST COMPLETE\n\nTotal Sent:    "+d.total_sent.toLocaleString()+
+        "\nSuccessful:    "+d.successful.toLocaleString()+
+        "\nFailed:        "+d.failed.toLocaleString()+
+        "\nLGAs Reached:  "+d.lgas_reached+
+        (d.lgas_skipped>0?"\nLGAs Skipped:  "+d.lgas_skipped+" (no weather data)":"")+
+        "\nLanguage:      "+d.language+"\nScope:         "+d.scope,
+        d.failed===0?"ok":"info");
+      document.getElementById("bc-preview").style.display="none";btn.style.display="none";
+      refreshStats();
+    })
+    .catch(function(e){showOut("bc-out","bc-body","Error: "+e.message,"err");btn.disabled=false;btn.textContent="SEND NOW";});
+}
+
+function previewSMS(){
+  var state=document.getElementById("s-state").value,lga=document.getElementById("s-lga").value;
+  var role=document.getElementById("s-role").value,lang=document.getElementById("s-lang").value;
+  if(!state||!lga){alert("Please select State and LGA.");return;}
+  showLoading("s-out","s-body","Fetching weather data...");
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);fd.append("role",role);fd.append("lang",lang);
+  fetch("/preview",{method:"POST",body:fd})
+    .then(function(r){return r.text();})
+    .then(function(t){showOut("s-out","s-body",t,"info");})
+    .catch(function(e){showOut("s-out","s-body","Error: "+e.message,"err");});
+}
+
+function sendWeatherSMS(){
+  var state=document.getElementById("s-state").value,lga=document.getElementById("s-lga").value;
+  var role=document.getElementById("s-role").value,lang=document.getElementById("s-lang").value;
+  if(!state||!lga){alert("Please select State and LGA.");return;}
+  if(!confirm("Send "+(LANG_LBL[lang]||lang)+" weather SMS to onboarded beneficiaries in "+lga+", "+state+"?"))return;
+  showLoading("s-out","s-body","Sending weather alerts...");
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);fd.append("role",role);fd.append("lang",lang);
+  fetch("/send_weather",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showOut("s-out","s-body","Error: "+d.error,"err");return;}
+      showOut("s-out","s-body","Dispatch Complete\n\nSent: "+d.sent+"  |  Successful: "+d.successful+"  |  Failed: "+d.failed+
+        "\nLanguage: "+(LANG_LBL[lang]||lang)+"\n\nMessage preview:\n"+d.message_preview,d.failed===0?"ok":"info");
+      refreshStats();
+    })
+    .catch(function(e){showOut("s-out","s-body","Error: "+e.message,"err");});
+}
+
+function waGenerate(previewOnly){
+  var state=document.getElementById("wa-state").value,lga=document.getElementById("wa-lga").value;
+  var role=document.getElementById("wa-role").value,lang=document.getElementById("wa-lang").value;
+  if(!state||!lga){alert("Please select State and LGA.");return;}
+  showLoading("wa-out","wa-body",previewOnly?"Building advisory...":"Building WhatsApp broadcast...");
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);fd.append("role",role);fd.append("lang",lang);
+  fd.append("preview",previewOnly?"1":"0");
+  fetch("/whatsapp_broadcast",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showOut("wa-out","wa-body","Error: "+d.error,"err");return;}
+      var box=document.getElementById("wa-out"),body=document.getElementById("wa-body");
+      box.style.display="block";box.className="out-box ok";
+      if(previewOnly){
+        body.innerHTML="<div style='white-space:pre-wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:8px'>"+escHtml(d.message)+"</div>"+
+          "<div style='font-size:12px;color:#666'>"+d.characters+"/306 characters ("+(d.characters>160?"2 SMS pages":"1 SMS page")+") · Language: "+(LANG_LBL[lang]||lang)+"</div>";
+        return;
+      }
+      var enc=encodeURIComponent(d.message);
+      var nums=d.recipients.map(function(r){return r.phone;}).join(", ");
+      var html="<div style='white-space:pre-wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:10px'>"+escHtml(d.message)+"</div>"+
+        "<div style='font-size:12px;color:#666;margin-bottom:10px'>"+d.characters+"/306 characters · <strong>"+d.count+"</strong> opted-in recipient(s) in "+escHtml(lga)+", "+escHtml(state)+"</div>"+
+        "<div style='margin-bottom:12px'>"+
+          "<button class='btn btn-outline' onclick='waCopy(\"msg\")'>📋 Copy Message</button> "+
+          "<button class='btn btn-outline' onclick='waCopy(\"nums\")'>📋 Copy All Numbers (Broadcast List)</button>"+
+        "</div>"+
+        "<textarea id='wa-copy-msg' style='position:absolute;left:-9999px'>"+escHtml(d.message)+"</textarea>"+
+        "<textarea id='wa-copy-nums' style='position:absolute;left:-9999px'>"+nums+"</textarea>";
+      if(d.count>0){
+        html+="<div style='max-height:280px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px'><table style='width:100%;border-collapse:collapse;font-size:13px'>"+
+          "<tr style='background:#f8fafc'><th style='text-align:left;padding:8px'>Beneficiary</th><th style='text-align:left;padding:8px'>Phone</th><th style='padding:8px'></th></tr>";
+        d.recipients.forEach(function(r){
+          html+="<tr style='border-top:1px solid #f1f5f9'><td style='padding:8px'>"+escHtml(r.name)+"</td><td style='padding:8px'>"+r.phone+"</td>"+
+            "<td style='padding:8px;text-align:right'><a href='https://wa.me/"+r.phone+"?text="+enc+"' target='_blank' rel='noopener' style='background:#25D366;color:#fff;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600'>🟢 Open Chat</a></td></tr>";
+        });
+        html+="</table></div><div style='font-size:11px;color:#999;margin-top:8px'>Tip: for bulk delivery, copy all numbers into a WhatsApp Broadcast List, then paste the copied message once. Dispatch has been logged.</div>";
+      } else {
+        html+="<div style='color:#999'>No opted-in beneficiaries match this selection.</div>";
+      }
+      body.innerHTML=html;
+    })
+    .catch(function(e){showOut("wa-out","wa-body","Error: "+e.message,"err");});
+}
+function waCopy(which){
+  var el=document.getElementById(which==="msg"?"wa-copy-msg":"wa-copy-nums");
+  el.style.position="static";el.select();document.execCommand("copy");el.style.position="absolute";
+  alert(which==="msg"?"Message copied.":"Numbers copied — paste into your WhatsApp Broadcast List.");
+}
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+// ── Team: Extension Agents & Climate Champions ─────────────────────────────
+var _teamInit=false;
+function initTeamTab(){
+  // SPMU has no state select — load their own state's LGAs into tm-lga
+  if(!_teamInit && CURRENT_ROLE==="spmu" && CURRENT_STATE){
+    _teamInit=true;
+    fetch("/api/lgas?state="+encodeURIComponent(CURRENT_STATE))
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var sel=document.getElementById("tm-lga");
+        sel.innerHTML='<option value="">— Select LGA —</option>';
+        (d.lgas||[]).forEach(function(l){var o=document.createElement("option");o.value=l;o.textContent=l;sel.appendChild(o);});
+      });
+  }
+  loadTeamList();
+}
+function loadTeamList(){
+  fetch("/api/users").then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById("tm-list").innerHTML="<div style='color:#999'>"+escHtml(d.error)+"</div>";return;}
+    var ROLE_LBL={owner:"Owner",admin:"NPMU Admin",spmu:"SPMU",extension_agent:"Extension Agent",climate_champion:"Climate Champion"};
+    var html="<div style='font-weight:600;color:var(--slate-700);margin-bottom:.5rem'>Team Members ("+d.users.length+")</div>"+
+      "<div style='overflow-x:auto;border:1px solid #e5e7eb;border-radius:8px'><table style='width:100%;border-collapse:collapse;font-size:13px'>"+
+      "<tr style='background:#f8fafc'><th style='text-align:left;padding:8px'>Username</th><th style='text-align:left;padding:8px'>Role</th><th style='text-align:left;padding:8px'>State</th><th style='text-align:left;padding:8px'>LGA</th><th style='text-align:left;padding:8px'>Cluster</th><th style='padding:8px'></th></tr>";
+    d.users.forEach(function(u){
+      var deletable=(u.role==="extension_agent"||u.role==="climate_champion"||CURRENT_ROLE==="owner"||CURRENT_ROLE==="admin")&&u.role!=="owner";
+      html+="<tr style='border-top:1px solid #f1f5f9'><td style='padding:8px'>"+escHtml(u.username)+"</td>"+
+        "<td style='padding:8px'>"+(ROLE_LBL[u.role]||u.role)+"</td>"+
+        "<td style='padding:8px'>"+escHtml(u.state||"All")+"</td>"+
+        "<td style='padding:8px'>"+escHtml(u.lga||"—")+"</td>"+
+        "<td style='padding:8px'>"+escHtml(u.cluster||"—")+"</td>"+
+        "<td style='padding:8px;text-align:right'>"+(deletable?"<button class='btn btn-outline' style='padding:3px 10px;font-size:11px' onclick='deleteTeamUser("+u.id+",\""+escHtml(u.username)+"\")'>🗑 Remove</button>":"")+"</td></tr>";
+    });
+    html+="</table></div>";
+    document.getElementById("tm-list").innerHTML=html;
+  });
+}
+function addTeamUser(){
+  var fd=new FormData();
+  fd.append("username",document.getElementById("tm-username").value.trim());
+  fd.append("email",document.getElementById("tm-email").value.trim());
+  fd.append("password",document.getElementById("tm-password").value);
+  fd.append("role",document.getElementById("tm-role").value);
+  var st=document.getElementById("tm-state");
+  fd.append("state",st?st.value:CURRENT_STATE);
+  fd.append("lga",document.getElementById("tm-lga").value);
+  fd.append("cluster",document.getElementById("tm-cluster").value.trim());
+  showLoading("tm-out","tm-body","Creating account...");
+  fetch("/api/users/add",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showOut("tm-out","tm-body","Error: "+d.error,"err");return;}
+      showOut("tm-out","tm-body",d.message+"\n\nShare the login securely (WhatsApp/Signal) and ask them to change the password on first login.","ok");
+      document.getElementById("tm-username").value="";document.getElementById("tm-email").value="";
+      document.getElementById("tm-password").value="";document.getElementById("tm-cluster").value="";
+      loadTeamList();
+    })
+    .catch(function(e){showOut("tm-out","tm-body","Error: "+e.message,"err");});
+}
+function deleteTeamUser(id,name){
+  if(!confirm("Remove user '"+name+"'? They will no longer be able to log in."))return;
+  fetch("/api/users/"+id+"/delete",{method:"POST"})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){alert(d.error);return;}
+      loadTeamList();
+    });
+}
+
+// ── AWS Stations: Health Monitoring ─────────────────────────────────────────
+var _stationsInit=false, _stationsCache=[];
+function initStationsTab(){
+  if(!_stationsInit && CURRENT_ROLE==="spmu" && CURRENT_STATE){
+    _stationsInit=true;
+    fetch("/api/lgas?state="+encodeURIComponent(CURRENT_STATE)).then(function(r){return r.json();}).then(function(d){
+      var sel=document.getElementById("st-add-lga");
+      sel.innerHTML='<option value="">— Select LGA —</option>';
+      (d.lgas||[]).forEach(function(l){var o=document.createElement("option");o.value=l;o.textContent=l;sel.appendChild(o);});
+    });
+  }
+  loadStationsList();
+}
+function loadStationsList(){
+  fetch("/api/stations").then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById("station-list-table").innerHTML="<div style='color:#999'>"+escHtml(d.error)+"</div>";return;}
+    _stationsCache = d.stations||[];
+    var sel=document.getElementById("st-select");
+    var keepVal=sel.value;
+    sel.innerHTML='<option value="">— Select a station —</option>';
+    _stationsCache.forEach(function(s){
+      var o=document.createElement("option");o.value=s.id;
+      o.textContent=(s.device_name||s.device_id)+" — "+s.lga+", "+s.state;
+      sel.appendChild(o);
+    });
+    if(keepVal) sel.value=keepVal;
+    fetch("/api/stations/health").then(function(r){return r.json();}).then(function(h){
+      document.getElementById("sk-total").textContent=h.total;
+      document.getElementById("sk-online").textContent=h.online;
+      document.getElementById("sk-offline").textContent=h.offline;
+      document.getElementById("sk-lowbatt").textContent=h.low_battery;
+      document.getElementById("sk-faults").textContent=h.sensor_faults;
+      var mk=document.getElementById("mk-stations-online"),mkT=document.getElementById("mk-stations-total");
+      if(mk) mk.textContent=h.online; if(mkT) mkT.textContent=h.total;
+    });
+    var html="<div style='overflow-x:auto;border:1px solid #e5e7eb;border-radius:8px'><table style='width:100%;border-collapse:collapse;font-size:12px'>"+
+      "<tr style='background:#f8fafc'><th style='text-align:left;padding:8px'>Station</th><th style='text-align:left;padding:8px'>State/LGA</th><th style='text-align:left;padding:8px'>Supplier</th><th style='padding:8px'>Status</th><th style='padding:8px'>Battery</th><th style='padding:8px'>Last Data</th><th style='padding:8px'></th></tr>";
+    _stationsCache.forEach(function(s){
+      var pill = s.is_online===true?"<span style='background:#ecfdf5;color:#065f46;padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px'>🟢 Online</span>"
+               : s.is_online===false?"<span style='background:#fef2f2;color:#991B1B;padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px'>🔴 Offline</span>"
+               : "<span style='background:#f1f5f9;color:#64748B;padding:2px 8px;border-radius:99px;font-weight:700;font-size:11px'>⚪ Not Checked</span>";
+      html+="<tr style='border-top:1px solid #f1f5f9'><td style='padding:8px'>"+escHtml(s.device_name||s.device_id)+"<div style='font-size:10px;color:#999'>"+escHtml(s.device_id)+"</div></td>"+
+        "<td style='padding:8px'>"+escHtml(s.lga)+", "+escHtml(s.state)+"</td>"+
+        "<td style='padding:8px'>"+escHtml(s.supplier||"—")+"</td>"+
+        "<td style='padding:8px;text-align:center'>"+pill+"</td>"+
+        "<td style='padding:8px;text-align:center'>"+(s.battery_level!=null?s.battery_level+"%":"—")+"</td>"+
+        "<td style='padding:8px'>"+(s.last_seen||"Never")+"</td>"+
+        "<td style='padding:8px;text-align:right'><button class='btn btn-outline' style='padding:3px 10px;font-size:11px' onclick=\"quickTest("+s.id+")\">🔄 Test</button> "+
+        "<button class='btn btn-outline' style='padding:3px 10px;font-size:11px' onclick=\"deleteStation("+s.id+",'"+escHtml(s.device_name||s.device_id)+"')\">🗑</button></td></tr>";
+    });
+    html+="</table></div>";
+    document.getElementById("station-list-table").innerHTML=html;
+  });
+}
+function addStation(){
+  var fd=new FormData();
+  fd.append("state",document.getElementById("st-add-state").value);
+  fd.append("lga",document.getElementById("st-add-lga").value);
+  fd.append("device_id",document.getElementById("st-add-device").value.trim());
+  fd.append("device_name",document.getElementById("st-add-name").value.trim());
+  var supplierEl=document.getElementById("st-add-supplier");
+  if(supplierEl) fd.append("supplier",supplierEl.value.trim());
+  showLoading("st-add-out","st-add-body","Registering station...");
+  fetch("/api/stations/add",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){showOut("st-add-out","st-add-body","Error: "+d.error,"err");return;}
+    showOut("st-add-out","st-add-body",d.message,"ok");
+    document.getElementById("st-add-device").value="";document.getElementById("st-add-name").value="";
+    loadStationsList();
+  }).catch(function(e){showOut("st-add-out","st-add-body","Error: "+e.message,"err");});
+}
+function deleteStation(id,name){
+  if(!confirm("Remove station '"+name+"'? This cannot be undone."))return;
+  fetch("/api/stations/"+id,{method:"DELETE"}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){alert(d.error);return;}
+    loadStationsList();
+    if(document.getElementById("st-select").value==String(id)) document.getElementById("station-health-card").innerHTML="";
+  });
+}
+function quickTest(id){
+  document.getElementById("st-select").value=id;
+  renderStationHealth();
+}
+function renderStationHealth(){
+  var id=document.getElementById("st-select").value;
+  var card=document.getElementById("station-health-card");
+  if(!id){card.innerHTML="";return;}
+  card.innerHTML="<div style='padding:1rem;color:#999'><span class='spin'></span> Checking station health...</div>";
+  fetch("/api/stations/"+id+"/test",{method:"POST"}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){card.innerHTML="<div style='color:#991B1B;padding:1rem;background:#fef2f2;border-radius:8px'>"+escHtml(d.error)+"</div>";return;}
+    var pill = d.is_online===true?"<span style='background:#ecfdf5;color:#065f46;padding:4px 12px;border-radius:99px;font-weight:700'>🟢 Online</span>"
+             : d.is_online===false?"<span style='background:#fef2f2;color:#991B1B;padding:4px 12px;border-radius:99px;font-weight:700'>🔴 Offline</span>"
+             : "<span style='background:#f1f5f9;color:#64748B;padding:4px 12px;border-radius:99px;font-weight:700'>⚪ Unknown</span>";
+    var r=d.reading||{};
+    var sensorPill = r.sensor_status==="ok" ? "<span style='color:#065f46;font-weight:700'>✅ OK</span>"
+                    : r.sensor_status==="fault" ? "<span style='color:#991B1B;font-weight:700'>⚠️ Fault</span>" : "—";
+    var html="<div style='background:#fff;border:1.5px solid var(--slate-100);border-radius:10px;padding:1.1rem;margin-top:.75rem'>"+
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem'><strong>"+escHtml(d.station.device_name||d.station.device_id)+"</strong>"+pill+"</div>"+
+      "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;font-size:.85rem'>"+
+        "<div><div style='color:#999;font-size:.7rem;text-transform:uppercase'>Last Data Received</div><div style='font-weight:600'>"+(d.last_active||d.station.last_seen||"Never")+"</div></div>"+
+        "<div><div style='color:#999;font-size:.7rem;text-transform:uppercase'>Battery Level</div><div style='font-weight:600'>"+(r.battery_level!=null?r.battery_level+"%":"Not available")+"</div></div>"+
+        "<div><div style='color:#999;font-size:.7rem;text-transform:uppercase'>Signal Strength</div><div style='font-weight:600'>"+(r.signal_strength!=null?r.signal_strength+"%":"Not available")+"</div></div>"+
+        "<div><div style='color:#999;font-size:.7rem;text-transform:uppercase'>Sensor Status</div><div style='font-weight:600'>"+sensorPill+"</div></div>"+
+      "</div>";
+    if(r.temperature_c!=null || r.rainfall_24h_mm!=null){
+      html+="<div style='margin-top:.85rem;padding-top:.85rem;border-top:1px solid var(--slate-100);display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.5rem;font-size:.82rem'>"+
+        "<div>🌡️ "+(r.temperature_c!=null?r.temperature_c+"°C":"—")+"</div>"+
+        "<div>💧 "+(r.humidity_pct!=null?r.humidity_pct+"%":"—")+"</div>"+
+        "<div>🌧️ "+(r.rainfall_24h_mm!=null?r.rainfall_24h_mm+"mm/24h":"—")+"</div>"+
+        "<div>💨 "+(r.wind_speed!=null?r.wind_speed+" km/h":"—")+"</div>"+
+      "</div>";
+    }
+    if(d.error){html+="<div style='margin-top:.75rem;color:#991B1B;font-size:.8rem'>⚠️ "+escHtml(d.error)+"</div>";}
+    html+="</div>";
+    card.innerHTML=html;
+    loadStationsList();
+  }).catch(function(e){card.innerHTML="<div style='color:#991B1B'>Error: "+escHtml(e.message)+"</div>";});
+}
+
+// ── Field Reports & Farmer Feedback (IFAD) ──────────────────────────────────
+var _frInit=false;
+function initFieldReportsTab(){
+  if(!_frInit){
+    _frInit=true;
+    var lgaSel=document.getElementById("fr-lga");
+    if(lgaSel && CURRENT_ROLE==="spmu" && CURRENT_STATE){
+      fetch("/api/lgas?state="+encodeURIComponent(CURRENT_STATE)).then(function(r){return r.json();}).then(function(d){
+        lgaSel.innerHTML='<option value="">— Select LGA —</option>';
+        (d.lgas||[]).forEach(function(l){var o=document.createElement("option");o.value=l;o.textContent=l;lgaSel.appendChild(o);});
+      });
+    }
+  }
+  loadFeedbackSummary(); loadAdoptionSummary(); loadFieldReportsList();
+}
+function submitFieldReport(){
+  var fd=new FormData();
+  var lgaSel=document.getElementById("fr-lga");
+  if(lgaSel) fd.append("lga",lgaSel.value);
+  fd.append("cluster",document.getElementById("fr-cluster").value.trim());
+  var dt=document.getElementById("fr-date").value.trim();
+  if(dt) fd.append("report_date",dt);
+  fd.append("farmers_reached",document.getElementById("fr-reached").value||"0");
+  fd.append("farmers_adopted",document.getElementById("fr-adopted").value||"0");
+  fd.append("farmers_partial",document.getElementById("fr-partial").value||"0");
+  fd.append("farmers_not_adopted",document.getElementById("fr-notadopted").value||"0");
+  fd.append("activities_notes",document.getElementById("fr-activities").value.trim());
+  fd.append("challenges_notes",document.getElementById("fr-challenges").value.trim());
+  showLoading("fr-out","fr-body","Submitting report...");
+  fetch("/api/field-reports/add",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){showOut("fr-out","fr-body","Error: "+d.error,"err");return;}
+    var extra=d.adoption_rate_pct!=null?" Adoption rate: "+d.adoption_rate_pct+"%.":"";
+    showOut("fr-out","fr-body",d.message+"."+extra,"ok");
+    ["fr-cluster","fr-date","fr-reached","fr-adopted","fr-partial","fr-notadopted","fr-activities","fr-challenges"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value="";
+    });
+    loadAdoptionSummary(); loadFieldReportsList();
+  }).catch(function(e){showOut("fr-out","fr-body","Error: "+e.message,"err");});
+}
+function logFeedback(useful){
+  var fd=new FormData();
+  fd.append("farmer_name",document.getElementById("fb-name").value.trim());
+  fd.append("farmer_phone",document.getElementById("fb-phone").value.trim());
+  fd.append("comment",document.getElementById("fb-comment").value.trim());
+  fd.append("useful",useful?"true":"false");
+  showLoading("fb-out","fb-body","Logging feedback...");
+  fetch("/api/feedback/add",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){showOut("fb-out","fb-body","Error: "+d.error,"err");return;}
+    showOut("fb-out","fb-body",d.message,"ok");
+    ["fb-name","fb-phone","fb-comment"].forEach(function(id){document.getElementById(id).value="";});
+    loadFeedbackSummary();
+  }).catch(function(e){showOut("fb-out","fb-body","Error: "+e.message,"err");});
+}
+function loadFeedbackSummary(){
+  fetch("/api/feedback/summary").then(function(r){return r.json();}).then(function(d){
+    document.getElementById("fk-useful").textContent=d.useful;
+    document.getElementById("fk-notuseful").textContent=d.not_useful;
+    document.getElementById("fk-pct").textContent=d.useful_pct!=null?d.useful_pct+"%":"—";
+  });
+  fetch("/api/feedback").then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById("feedback-list-table").innerHTML="<div style='color:#999'>"+escHtml(d.error)+"</div>";return;}
+    if(!d.feedback.length){document.getElementById("feedback-list-table").innerHTML="<div style='color:#999'>No feedback logged yet.</div>";return;}
+    var html="<div style='overflow-x:auto;border:1px solid #e5e7eb;border-radius:8px;max-height:260px;overflow-y:auto'><table style='width:100%;border-collapse:collapse;font-size:12px'>"+
+      "<tr style='background:#f8fafc'><th style='text-align:left;padding:8px'>Date</th><th style='text-align:left;padding:8px'>State/LGA</th><th style='padding:8px'>Rating</th><th style='text-align:left;padding:8px'>Channel</th><th style='text-align:left;padding:8px'>Comment</th></tr>";
+    d.feedback.forEach(function(f){
+      html+="<tr style='border-top:1px solid #f1f5f9'><td style='padding:8px'>"+f.created+"</td><td style='padding:8px'>"+escHtml(f.lga||"—")+", "+escHtml(f.state)+"</td>"+
+        "<td style='padding:8px;text-align:center'>"+(f.useful?"👍":"👎")+"</td><td style='padding:8px'>"+escHtml(f.channel)+"</td><td style='padding:8px'>"+escHtml(f.comment||"—")+"</td></tr>";
+    });
+    html+="</table></div>";
+    document.getElementById("feedback-list-table").innerHTML=html;
+  });
+}
+function loadAdoptionSummary(){
+  fetch("/api/field-reports/summary").then(function(r){return r.json();}).then(function(d){
+    document.getElementById("ak-reached").textContent=d.farmers_reached;
+    document.getElementById("ak-adopted").textContent=d.farmers_adopted;
+    document.getElementById("ak-partial").textContent=d.farmers_partial;
+    document.getElementById("ak-rate").textContent=d.overall_adoption_rate_pct!=null?d.overall_adoption_rate_pct+"%":"—";
+  });
+}
+function loadFieldReportsList(){
+  fetch("/api/field-reports").then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById("fieldreport-list-table").innerHTML="<div style='color:#999'>"+escHtml(d.error)+"</div>";return;}
+    if(!d.reports.length){document.getElementById("fieldreport-list-table").innerHTML="<div style='color:#999'>No field reports submitted yet.</div>";return;}
+    var html="<div style='overflow-x:auto;border:1px solid #e5e7eb;border-radius:8px;max-height:300px;overflow-y:auto'><table style='width:100%;border-collapse:collapse;font-size:12px'>"+
+      "<tr style='background:#f8fafc'><th style='text-align:left;padding:8px'>Date</th><th style='text-align:left;padding:8px'>By</th><th style='text-align:left;padding:8px'>LGA</th><th style='padding:8px'>Reached</th><th style='padding:8px'>Adopted</th><th style='padding:8px'>Rate</th></tr>";
+    d.reports.forEach(function(r){
+      html+="<tr style='border-top:1px solid #f1f5f9'><td style='padding:8px'>"+r.date+"</td><td style='padding:8px'>"+escHtml(r.submitted_by)+"</td>"+
+        "<td style='padding:8px'>"+escHtml(r.lga)+", "+escHtml(r.state)+"</td><td style='padding:8px;text-align:center'>"+r.farmers_reached+"</td>"+
+        "<td style='padding:8px;text-align:center'>"+r.farmers_adopted+"</td><td style='padding:8px;text-align:center'>"+(r.adoption_rate_pct!=null?r.adoption_rate_pct+"%":"—")+"</td></tr>";
+    });
+    html+="</table></div>";
+    document.getElementById("fieldreport-list-table").innerHTML=html;
+  });
+}
+
+function exportLogs(){
+  var state=document.getElementById("r-state").value,lga=document.getElementById("r-lga").value;
+  var url="/export_logs?";
+  if(state)url+="state="+encodeURIComponent(state)+"&";
+  if(lga)url+="lga="+encodeURIComponent(lga);
+  window.location.href=url;
+  showOut("r-out","r-body","Download started. Check your Downloads folder.","ok");
+}
+
+function testSMS(){
+  showLoading("r-out","r-body","Testing Termii connection...");
+  fetch("/api/sms-test")
+    .then(function(r){
+      if(r.status===401||r.redirected){showOut("r-out","r-body","Session expired. Please refresh and log in again.","err");return null;}
+      return r.json();
+    })
+    .then(function(d){
+      if(!d)return;
+      showOut("r-out","r-body",d.ok?d.message+"\n\nSender ID:  VCDP\nAPI Key:    Active\nGateway:    api.ng.termii.com":"Error: "+d.message+"\n\nMake sure:\n1. Flask server is running\n2. Internet is available",d.ok?"ok":"err");
+    })
+    .catch(function(e){
+      showOut("r-out","r-body","Cannot reach the server.\n\nMake sure:\n1. Double-click START_WINDOWS.bat to start the server\n2. Open http://localhost:5000\n3. Or refresh and log in again\n\nError: "+e.message,"err");
+    });
+}
+
+function testWhatsApp(){
+  showLoading("r-out","r-body","Testing WhatsApp channel (wa.me)...");
+  fetch("/api/whatsapp-test")
+    .then(function(r){
+      if(r.status===401||r.redirected){showOut("r-out","r-body","Session expired. Please refresh and log in again.","err");return null;}
+      return r.json();
+    })
+    .then(function(d){
+      if(!d)return;
+      var ok = d.wa_me_reachable;
+      showOut("r-out","r-body",
+        (ok?"WhatsApp channel is READY ✓":"WhatsApp channel UNREACHABLE ✗")+
+        "\n\nwa.me reachable:              "+(ok?"Yes":"No")+
+        "\nWhatsApp dispatches logged:   "+d.whatsapp_dispatches_logged+
+        "\nBeneficiaries w/ WhatsApp no: "+d.beneficiaries_with_whatsapp_contact+
+        "\n\n"+d.note, ok?"ok":"err");
+    })
+    .catch(function(e){showOut("r-out","r-body","Cannot reach the server.\n\nError: "+e.message,"err");});
+}
+
+function seedTemplates(){
+  showLoading("r-out","r-body","Initializing SMS templates...");
+  fetch("/seed_templates",{method:"POST"})
+    .then(function(r){return r.json();})
+    .then(function(d){showOut("r-out","r-body",d.message+" (Total in database: "+d.total+")","ok");})
+    .catch(function(e){showOut("r-out","r-body","Error: "+e.message,"err");});
+}
+var pendingDelete = null;
+
+function checkDeleteCount(){
+  var state=document.getElementById("d-state").value;
+  var lga=document.getElementById("d-lga").value;
+  if(!state){alert("Please select a State first.");return;}
+  document.getElementById("d-delete-btn").style.display="none";
+  pendingDelete=null;
+  showLoading("d-out","d-body","Checking records...");
+  var url="/api/beneficiaries/count?state="+encodeURIComponent(state);
+  if(lga) url+="&lga="+encodeURIComponent(lga);
+  fetch(url)
+    .then(function(r){return r.json().then(function(d){return {ok:r.ok,data:d};});})
+    .then(function(res){
+      var d=res.data;
+      if(!res.ok || d.error){showOut("d-out","d-body","Error: "+(d.error||"request failed"),"err");return;}
+      var scope=d.lga?(d.lga+", "+d.state):("all LGAs in "+d.state);
+      var txt="Found "+d.beneficiary_count.toLocaleString()+" beneficiary record(s) and "+
+              d.sms_log_count.toLocaleString()+" SMS log(s) for "+scope+".";
+      if(d.beneficiary_count===0){
+        showOut("d-out","d-body",txt+"\n\nNothing to delete.","info");
+        return;
+      }
+      txt+="\n\nClick 'Delete These Records' to permanently remove them. This cannot be undone.";
+      showOut("d-out","d-body",txt,"info");
+      pendingDelete={state:d.state, lga:d.lga, count:d.beneficiary_count};
+      var btn=document.getElementById("d-delete-btn");
+      btn.style.display="inline-flex";
+      btn.textContent="🗑 Delete "+d.beneficiary_count.toLocaleString()+" Record(s)";
+    })
+    .catch(function(e){showOut("d-out","d-body","Error: "+e.message,"err");});
+}
+
+function confirmDeleteBeneficiaries(){
+  if(!pendingDelete){alert("Please check the record count first.");return;}
+  var scope=pendingDelete.lga?(pendingDelete.lga+", "+pendingDelete.state):("ALL LGAs in "+pendingDelete.state);
+  var msg="FINAL CONFIRMATION\n\nThis will permanently delete "+pendingDelete.count.toLocaleString()+
+          " beneficiary record(s) and all their SMS history for:\n\n"+scope+
+          "\n\nThis action CANNOT be undone. Continue?";
+  if(!confirm(msg))return;
+  var btn=document.getElementById("d-delete-btn");
+  btn.disabled=true;btn.textContent="Deleting...";
+  showLoading("d-out","d-body","Deleting records...");
+  var fd=new FormData();
+  fd.append("state",pendingDelete.state);
+  if(pendingDelete.lga) fd.append("lga",pendingDelete.lga);
+  fd.append("confirm","yes");
+  fetch("/api/beneficiaries/delete",{method:"POST",body:fd})
+    .then(function(r){return r.json().then(function(d){return {ok:r.ok,data:d};});})
+    .then(function(res){
+      var d=res.data;
+      btn.disabled=false;btn.style.display="none";
+      if(!res.ok || d.error){showOut("d-out","d-body","Error: "+(d.error||"request failed"),"err");return;}
+      showOut("d-out","d-body",d.message,"ok");
+      pendingDelete=null;
+      refreshStats();
+    })
+    .catch(function(e){showOut("d-out","d-body","Error: "+e.message,"err");btn.disabled=false;});
+}
+
+function loadProgrammeLGAs(){
+  fetch("/api/programme-lgas")
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var canEdit = d.can_edit;
+      document.getElementById("lga-add-form").style.display = canEdit ? "" : "none";
+      document.getElementById("lga-add-btn-row").style.display = canEdit ? "" : "none";
+      document.getElementById("lga-mgmt-sub").textContent = canEdit
+        ? "As the VCDP programme expands into new Local Government Areas, add them here — they immediately become available in every State/LGA dropdown across the system, and on the downloadable templates."
+        : "Programme LGAs for your state. Only the Programme Administrator or NPMU can add or remove LGAs.";
+
+      var container = document.getElementById("lga-list-container");
+      container.innerHTML = "";
+      var states = Object.keys(d.lgas_by_state).sort();
+      states.forEach(function(state){
+        var lgas = d.lgas_by_state[state] || [];
+        var block = document.createElement("div");
+        block.className = "lga-state-block";
+        var nameDiv = document.createElement("div");
+        nameDiv.className = "lga-state-name";
+        nameDiv.textContent = state + " (" + lgas.length + ")";
+        block.appendChild(nameDiv);
+        var row = document.createElement("div");
+        row.className = "lga-chip-row";
+        if(lgas.length===0){
+          var empty=document.createElement("span");
+          empty.className="lga-empty";
+          empty.textContent="No LGAs configured yet.";
+          row.appendChild(empty);
+        } else {
+          lgas.forEach(function(lga){
+            var chip = document.createElement("span");
+            chip.className = "lga-chip";
+            var txt = document.createElement("span");
+            txt.textContent = lga;
+            chip.appendChild(txt);
+            if(canEdit){
+              var rm = document.createElement("button");
+              rm.textContent = "✕";
+              rm.title = "Remove "+lga;
+              rm.onclick = function(){ removeProgrammeLGA(state, lga); };
+              chip.appendChild(rm);
+            }
+            row.appendChild(chip);
+          });
+        }
+        block.appendChild(row);
+        container.appendChild(block);
+      });
+    })
+    .catch(function(e){console.error("Failed to load programme LGAs:",e);});
+}
+
+function addProgrammeLGA(){
+  var state=document.getElementById("lga-add-state").value;
+  var lga=document.getElementById("lga-add-name").value.trim();
+  if(!state){alert("Please select a State.");return;}
+  if(!lga){alert("Please enter the new LGA name.");return;}
+  showLoading("lga-out","lga-body","Adding LGA...");
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);
+  fetch("/api/programme-lgas/add",{method:"POST",body:fd})
+    .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d};});})
+    .then(function(res){
+      var d=res.data;
+      if(!res.ok||d.error){showOut("lga-out","lga-body","Error: "+(d.error||"request failed"),"err");return;}
+      showOut("lga-out","lga-body",d.message,"ok");
+      document.getElementById("lga-add-name").value="";
+      clearLGACache();loadProgrammeLGAs();
+      lockStateDropdowns();
+    })
+    .catch(function(e){showOut("lga-out","lga-body","Error: "+e.message,"err");});
+}
+
+function removeProgrammeLGA(state, lga){
+  if(!confirm("Remove '"+lga+"' from "+state+"'s programme LGA list?\n\nIf beneficiaries are already registered under this LGA, you'll be warned and asked to confirm separately."))return;
+  showLoading("lga-out","lga-body","Removing LGA...");
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga);
+  fetch("/api/programme-lgas/remove",{method:"POST",body:fd})
+    .then(function(r){return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};});})
+    .then(function(res){
+      var d=res.data;
+      if(!res.ok){
+        if(d.beneficiary_count){
+          var force=confirm(d.error+"\n\nRemove anyway? Existing records will keep their LGA value but it will disappear from dropdowns.");
+          if(force){
+            var fd2=new FormData();fd2.append("state",state);fd2.append("lga",lga);fd2.append("force","yes");
+            fetch("/api/programme-lgas/remove",{method:"POST",body:fd2})
+              .then(function(r2){return r2.json();})
+              .then(function(d2){
+                showOut("lga-out","lga-body",d2.message||d2.error,d2.error?"err":"ok");
+                clearLGACache();loadProgrammeLGAs();lockStateDropdowns();
+              });
+          }
+          return;
+        }
+        showOut("lga-out","lga-body","Error: "+(d.error||"request failed"),"err");
+        return;
+      }
+      showOut("lga-out","lga-body",d.message,"ok");
+      clearLGACache();loadProgrammeLGAs();
+      lockStateDropdowns();
+    })
+    .catch(function(e){showOut("lga-out","lga-body","Error: "+e.message,"err");});
+}
+
+
+// ─── Custom Message Functions ─────────────────────────────────────────────
+function updateCharCount(){
+  var msg=document.getElementById("cm-message").value;
+  document.getElementById("char-count").textContent=msg.length;
+  if(msg.length>306){msg=msg.substring(0,306);document.getElementById("cm-message").value=msg;}
+}
+
+function setupCustomMessageForSPMU(){
+  var role=document.body.getAttribute("data-user-role");
+  var state=document.body.getAttribute("data-user-state");
+  if(role==="spmu"&&state){
+    document.getElementById("state-field").style.display="none";
+    document.getElementById("state-display").style.display="block";
+    document.getElementById("spmu-state-name").textContent=state;
+    document.getElementById("cm-state").value=state;
+    setTimeout(function(){loadLGAs("cm-state","cm-lga");},500);
+  }
+}
+
+function updateCharCount(){
+  var msg=document.getElementById("cm-message").value;
+  document.getElementById("char-count").textContent=msg.length;
+  if(msg.length>306){msg=msg.substring(0,306);document.getElementById("cm-message").value=msg;}
+}
+
+function previewCustomMessage(){
+  var state=document.getElementById("cm-state").value;
+  var lga=document.getElementById("cm-lga").value;
+  var msg=document.getElementById("cm-message").value;
+  if(!state){showOut("cm-out","cm-body","Please select a state","err");return;}
+  if(!msg){showOut("cm-out","cm-body","Please enter a message","err");return;}
+  var preview="📋 Preview\n\nState: "+state+"\nLGA: "+(lga||"All LGAs")+"\nMessage: "+msg+"\n\nReady to send. Click 'Send Custom Message' to proceed.";
+  showOut("cm-out","cm-body",preview,"ok");
+}
+
+function sendCustomMessage(){
+  var state=document.getElementById("cm-state").value;
+  var lga=document.getElementById("cm-lga").value;
+  var msg=document.getElementById("cm-message").value;
+  if(!state||!msg){showOut("cm-out","cm-body","State and message required","err");return;}
+  if(msg.length<5){showOut("cm-out","cm-body","Message too short (minimum 5 characters)","err");return;}
+  if(msg.length>306){showOut("cm-out","cm-body","Message too long (maximum 306 characters / 2 SMS pages)","err");return;}
+  var fd=new FormData();fd.append("state",state);fd.append("lga",lga||"");fd.append("message",msg);
+  fetch("/api/send-custom-message",{method:"POST",body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){showOut("cm-out","cm-body","Error: "+d.error,"err");return;}
+      var result="✅ Message Sent\n\nState: "+state+"\nRecipients targeted: "+d.recipients+"\nSuccessfully sent: "+d.sent+"\nFailed: "+d.failed+"\n\n"+d.message;
+      showOut("cm-out","cm-body",result,"ok");
+      document.getElementById("cm-message").value="";
+      updateCharCount();
+    })
+    .catch(function(e){showOut("cm-out","cm-body","Error: "+e.message,"err");});
+}
+
+</script>
+</body>
+</html>
