@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: vcdp_cis_db
+    environment:
+      POSTGRES_USER: vcdp_user
+      POSTGRES_PASSWORD: VcdpSecure2026!
+      POSTGRES_DB: vcdp_cis_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U vcdp_user -d vcdp_cis_db"]
+      interval: 10s; timeout: 5s; retries: 5
+    restart: unless-stopped
+  app:
+    build: .
+    container_name: vcdp_cis_app
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://vcdp_user:VcdpSecure2026!@db:5432/vcdp_cis_db
+      FLASK_ENV: production
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    command: >
+      sh -c "sleep 5 && flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - 'app:application'"
+volumes:
+  postgres_data:
+    driver: local

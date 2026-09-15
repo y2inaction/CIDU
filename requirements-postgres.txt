@@ -1,0 +1,3 @@
+# Optional — only needed for PostgreSQL deployments (Docker/cPanel VPS)
+# NOT needed on Windows local (uses SQLite)
+psycopg2-binary==2.9.9

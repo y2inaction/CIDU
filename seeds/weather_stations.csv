@@ -1,0 +1,5 @@
+state,lga,device_id,device_name,install_date,status
+Niger State,Minna,REPLACE_WITH_DEVICE_ID_1,Minna Central Station,2026-06-15,active
+Niger State,Mokwa,REPLACE_WITH_DEVICE_ID_2,Mokwa Rice Hub Station,2026-06-15,active
+Nasarawa State,Doma,REPLACE_WITH_DEVICE_ID_3,Doma Field Station,2026-06-15,pending
+Benue State,Logo,REPLACE_WITH_DEVICE_ID_4,Logo Cooperative Station,2026-06-15,pending
